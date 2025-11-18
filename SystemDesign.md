@@ -225,7 +225,7 @@ Failed tasks moved to `queue:dead` after max retries
 
 ---
 
-### **Table: url_analytics (aggregated by worker)**
+### **Table: url_analytics**
 
 | Field      | Type                             | Required | Default    | Note                     |
 |------------|----------------------------------|----------|------------|--------------------------|
@@ -236,6 +236,22 @@ Failed tasks moved to `queue:dead` after max retries
 | methodUsed | enum [None,Password,OTP,Approve] | Yes      | None       |                          |
 | createdAt  | timestamp                        | Yes      | Date.now() |                          |
 | meta       | jsonb                            | No       | -          |                          |
+
+---
+
+### **Table: notifications**
+
+| Field            | Type               | Required | Default    | Note                       |
+|------------------|--------------------|----------|------------|----------------------------|
+| notificationId   | uuid pk            | Yes      | -          | Primary key                |
+| userId           | fk                 | Yes      | -          | FK, users.userId, indexed  |
+| notificationType | enum [PUSH, EMAIL] | Yes      | -          |                            |
+| isSuccess        | boolean            | Yes      | -          | Successsfully sent         |
+| createdAt        | timestamp          | Yes      | Date.now() |                            |
+| clickedAt        | timestamp          | Yes      | null       | Null means not yet clicked |
+| readAt           | timestamp          | Yes      | null       |                            |
+| updatedAt        | timestamp          | Yes      | Date.now() |                            |
+| meta             | jsonb              | No       | -          | Metadata                   |
 
 ---
 
@@ -257,7 +273,6 @@ Failed tasks moved to `queue:dead` after max retries
 * Partition `url_analytics` by month
 * Potentially shard `urls` by shortId prefix when millions of entries
 
----
 
 ## **7. API Structure**
 
@@ -270,8 +285,11 @@ Creates a new short URL.
 ```json
 {
   "longUrl": "https://example.com",
-  "customAlias": "wizard",
-  "expiresAt": "2025-01-01"
+  "email?": "abc@gmail.com",
+  "protectionMethod?": ["PASSWORD"],
+  "password?": "(&*@hJAS)",
+  "isAnalyticsEnable?": true,
+  "customAlias?": "wizard",
 }
 ```
 
@@ -280,7 +298,8 @@ Creates a new short URL.
 ```json
 {
   "shortId": "wizard",
-  "shortUrl": "https://yourdomain.com/wizard"
+  "shortUrl": "https://yourdomain.com/wizard",
+  "isUrlSFW": true
 }
 ```
 
@@ -297,20 +316,67 @@ Creates a new short URL.
 
 Redirects to original URL.
 
+**Response**
+
+- Only if Protection is on or NSFW Url.
+- Long URL will only be send if it is NSFW.
+
+```json
+{
+  "isProtected": true,
+  "isNSFW": false,
+  "longUrl?": "abc.com",
+}
+```
+
 Flow:
 
 1. Check CDN
 2. Check Redis
 3. Check Postgres
 4. Push click event to queue
-5. Return 302
+5. Check for Protection and SFW
+6. If Protected -> Show password screen
+7. If NSFW -> Show redirection URL before redirecting
+8. Return 302
 
 ---
 
-### **GET /api/v1/url/:shortId**
+### **GET /api/v1/url/:shortId** (Auth required)
 
 Returns metadata.
 
+---
+
+### **GET /api/v1/notification/all** (Auth required)
+
+Get all the notifications
+
+**Request**
+
+- Default value for count is 10
+```json
+{
+  "userId": "abcd",
+  "count?": 10,
+}
+```
+
+**Response**
+
+```json
+{
+  "notifications": [{}]
+}
+```
+
+---
+
+### More needs to be added
+
+- POST /api/v1/:shortId/password
+- GET /api/v1/:shortId/analysis (Auth required)
+- GET /api/v1/:shortId/clicks (Auth required)
 ---
 
 ### **Auth**
@@ -416,13 +482,3 @@ Returns metadata.
 * Load testing results
 * ER diagram
 
----
-
-If you want, I can also create:
-
-* A **sample architecture diagram** layout you can copy
-* A **Docker Compose file**
-* A **Prisma schema**
-* Or a **README.md** that matches this document
-
-Just tell me what you want next.
