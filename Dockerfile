@@ -23,4 +23,4 @@ EXPOSE 3000
 # Run as non-root user for security
 USER node
 
-CMD ["npm", "start"]
+CMD ["npm", "run", "dev"]
