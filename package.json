@@ -1,0 +1,20 @@
+{
+  "name": "urlshortener",
+  "version": "1.0.0",
+  "description": "Write the short 2-page system design doc now (5–6 bullets).",
+  "homepage": "https://github.com/HET-SHUKLA/URLShortener#readme",
+  "bugs": {
+    "url": "https://github.com/HET-SHUKLA/URLShortener/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HET-SHUKLA/URLShortener.git"
+  },
+  "license": "ISC",
+  "author": "HET SHUKLA",
+  "type": "module",
+  "main": "src/server.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
