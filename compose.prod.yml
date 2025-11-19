@@ -1,37 +1,11 @@
 services:
-  postgres:
-    image: postgres
-    container_name: postgres_db
-    env_file:
-      - .env.local      
-    ports:
-      - 5432:5432
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-  
-  redis:
-    image: redis
-    container_name: redis_db
-    ports:
-      - 6379:6379
-    volumes:
-      - redisdata:/data
-
   server:
     build:
       context: .
-    container_name: url_shortener_backend
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
     ports:
       - 3000:3000
-    depends_on:
-      - redis
-      - postgres
-
-volumes:
-  pgdata:
-  redisdata:
 
 # The commented out section below is an example of how to define a PostgreSQL
 # database that your application can use. `depends_on` tells Docker Compose to

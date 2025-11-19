@@ -15,7 +15,7 @@ RUN npm install
 COPY . .
 
 # Set environment only for production builds
-ENV NODE_ENV=development
+#ENV NODE_ENV=development
 
 # Expose API port
 EXPOSE 3000
