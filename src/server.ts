@@ -32,8 +32,8 @@ fastify.get('/', async (request, reply) => {
 
 // Test Postgres route
 fastify.get('/db-test', async (request, reply) => {
-  const result = await pool.query('SELECT NOW() as now');
-  return reply.send({ now: result.rows[0].now });
+  const result = await pool.query('SELECT * FROM urls');
+  return reply.send({ urls: result.rows });
 });
 
 // Test Redis route

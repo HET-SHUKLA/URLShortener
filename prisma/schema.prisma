@@ -46,11 +46,15 @@ model User {
   // Relations
   urls           Url[]
   notifications  Notification[]
+  user_auth      UserAuth[] 
+
+  @@map("users")
 }
 
 // Table: user_auth
 model UserAuth {
   id           String        @id @default(uuid())
+  userId       String
   email        String        @unique
   authProvider AuthProvider
   password     String?       // password hash (for EMAIL provider)
@@ -58,6 +62,12 @@ model UserAuth {
   updatedAt    DateTime      @updatedAt
   lastSignInAt DateTime      @default(now())
   meta         Json?
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("user_auth")
+  @@index([userId])
 }
 
 // Table: urls
@@ -69,7 +79,7 @@ model Url {
   protectionMethod   ProtectionMethod @default(NONE)
   protectedPassword  String?          // password hash (if PASSWORD protection)
   isUrlSFW           Boolean          @default(true)
-  isAnalyticsEnable  Boolean          @default(true)
+  isAnalyticsEnabled Boolean          @default(true)
   // NOTE: app should set now()+5d / now()+6mo as needed
   expiresAt          DateTime
   renewAt            DateTime         @default(now())
@@ -85,6 +95,7 @@ model Url {
 
   @@index([ownerId])
   @@index([expiresAt])
+  @@map("urls")
 }
 
 // Table: url_analytics
@@ -102,6 +113,7 @@ model UrlAnalytics {
 
   @@index([urlId])
   @@index([createdAt])
+  @@map("url_analytics")
 }
 
 // Table: notifications
@@ -109,7 +121,7 @@ model Notification {
   notificationId   String           @id @default(uuid())
   userId           String
   notificationType NotificationType
-  isSuccess        Boolean
+  isSuccess        Boolean          @default(false)
   createdAt        DateTime         @default(now())
   clickedAt        DateTime?
   readAt           DateTime?
@@ -120,4 +132,6 @@ model Notification {
   user User @relation(fields: [userId], references: [id])
 
   @@index([userId])
+  @@index([createdAt])
+  @@map("notifications")
 }

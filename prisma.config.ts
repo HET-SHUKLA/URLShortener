@@ -5,8 +5,11 @@ import { defineConfig, env } from "prisma/config";
 
 // Load environment file based on parameter or default to .env.local
 dotenv.config({ 
-  path: process.env.ENV_FILE || ".env.local" 
+  path: process.env.ENV_FILE ?? ".env.local" 
 });
+
+// Overriding Database URL to use localhost. In .env.local, it is set to the docker container.
+const databaseUrl = process.env.DATABASE_URL_LOCALHOST ?? env("DATABASE_URL");  
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
@@ -14,6 +17,6 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: env("DATABASE_URL"),
+    url: databaseUrl,
   },
 });
