@@ -1,0 +1,123 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ===== Enums =====
+enum AuthProvider {
+  EMAIL
+  GOOGLE
+}
+
+enum ProtectionMethod {
+  NONE
+  PASSWORD
+  OTP
+  APPROVE
+}
+
+enum NotificationType {
+  PUSH
+  EMAIL
+}
+
+// ===== Models =====
+
+// Table: users
+model User {
+  id              String   @id @default(uuid())
+  email           String   @unique
+  isEmailVerified Boolean  @default(false)
+  emailVerifiedAt DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  deletedAt       DateTime?
+
+  // Relations
+  urls           Url[]
+  notifications  Notification[]
+}
+
+// Table: user_auth
+model UserAuth {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  authProvider AuthProvider
+  password     String?       // password hash (for EMAIL provider)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  lastSignInAt DateTime      @default(now())
+  meta         Json?
+}
+
+// Table: urls
+model Url {
+  id                 BigInt           @id @default(autoincrement())
+  shortId            String           @unique
+  longUrl            String
+  ownerId            String?          // FK to users.id
+  protectionMethod   ProtectionMethod @default(NONE)
+  protectedPassword  String?          // password hash (if PASSWORD protection)
+  isUrlSFW           Boolean          @default(true)
+  isAnalyticsEnable  Boolean          @default(true)
+  // NOTE: app should set now()+5d / now()+6mo as needed
+  expiresAt          DateTime
+  renewAt            DateTime         @default(now())
+  totalClicks        BigInt           @default(0)
+  totalSuccessClicks BigInt           @default(0)
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  meta               Json?
+
+  // Relations
+  owner       User?          @relation(fields: [ownerId], references: [id])
+  analytics   UrlAnalytics[]
+
+  @@index([ownerId])
+  @@index([expiresAt])
+}
+
+// Table: url_analytics
+model UrlAnalytics {
+  clickId    String            @id @default(uuid())
+  urlId      BigInt
+  isSuccess  Boolean           @default(false)
+  ipAddress  String            // hashed IP stored as string
+  methodUsed ProtectionMethod  @default(NONE)
+  createdAt  DateTime          @default(now())
+  meta       Json?
+
+  // Relations
+  url Url @relation(fields: [urlId], references: [id])
+
+  @@index([urlId])
+  @@index([createdAt])
+}
+
+// Table: notifications
+model Notification {
+  notificationId   String           @id @default(uuid())
+  userId           String
+  notificationType NotificationType
+  isSuccess        Boolean
+  createdAt        DateTime         @default(now())
+  clickedAt        DateTime?
+  readAt           DateTime?
+  updatedAt        DateTime         @updatedAt
+  meta             Json?
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}

@@ -102,11 +102,25 @@ project-root/
 1. `.env`
     - For sensitive data and API Keys.
     - It will be ignored while commiting and pushing
+    - We can have `.env.prod`, `.env.example` etc.
 
 2. `.env.sample`
     - For sample `.env` keys, To clone and run
 
 3. `docker-compose.yml`
+    - For running multiple services.
+    - There would be `compose.prod.yml` for production.
+
+4. `Dockerfle`
+    - To build and run application in Docker
+
+5. `tsconfig.json`
+    - For typescript confitguration
+
+6. `package.json`
+    - For packages
+
+7. `prisma/schema.prisma`
     - 
 
 
