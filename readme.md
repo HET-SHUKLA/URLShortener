@@ -121,7 +121,12 @@ project-root/
     - For packages
 
 7. `prisma/schema.prisma`
-    - 
+    - For database schema.
+
+8. `Migrations`
+    - For all the prisma schema migration
+  
+9. 
 
 
 ## PR Checklist
