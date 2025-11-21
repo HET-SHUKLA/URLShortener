@@ -2,10 +2,9 @@
 import Fastify from 'fastify';
 import { Pool } from 'pg';
 import { createClient } from 'redis';
+import { buildApp } from './app.js';
 
-const fastify = Fastify({
-  logger: true
-})
+const app = buildApp();
 
 // pg Pool
 // const pool = new Pool({
@@ -26,9 +25,9 @@ const fastify = Fastify({
 //   await redisClient.quit();
 // });
 
-fastify.get('/', async (request, reply) => {
-  return reply.send("<h1>Hello world</h1>")
-});
+// fastify.get('/', async (request, reply) => {
+//   return reply.send("<h1>Hello world</h1>")
+// });
 
 // // Test Postgres route
 // fastify.get('/db-test', async (request, reply) => {
@@ -49,11 +48,11 @@ fastify.get('/', async (request, reply) => {
 const start = async () => {
   try {
     // await redisClient.connect();
-    fastify.log.info('Connected to Redis');
+    app.log.info('Connected to Redis');
 
-    await fastify.listen({ port: 3000, host: '0.0.0.0' })
+    await app.listen({ port: 3000, host: '0.0.0.0' })
   } catch (err) {
-    fastify.log.error(err)
+    app.log.error(err)
     process.exit(1)
   }
 }
