@@ -3,6 +3,7 @@ import Fastify from 'fastify';
 import { Pool } from 'pg';
 import { createClient } from 'redis';
 import { buildApp } from './app.js';
+import { config } from './config/env.config.js';
 
 const app = buildApp();
 
@@ -50,7 +51,7 @@ const start = async () => {
     // await redisClient.connect();
     app.log.info('Connected to Redis');
 
-    await app.listen({ port: 3000, host: '0.0.0.0' })
+    await app.listen({ port: config.PORT, host: '0.0.0.0' })
   } catch (err) {
     app.log.error(err)
     process.exit(1)

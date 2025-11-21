@@ -1,6 +1,5 @@
 import { fastify, type FastifyInstance } from "fastify";
 import helmet from "@fastify/helmet";
-import { success } from "zod";
 
 export const buildApp = (): FastifyInstance => {
     
