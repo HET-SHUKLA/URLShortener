@@ -12,7 +12,6 @@
   },
   "license": "ISC",
   "author": "HET SHUKLA",
-  "type": "module",
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
