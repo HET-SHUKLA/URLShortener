@@ -3,6 +3,9 @@ import helmet from "@fastify/helmet";
 import { shutDownPrisma } from "./db/prisma";
 import { logError } from "./lib/logger";
 import { shutDownRedis } from "./db/redis";
+import { ZodError } from "zod";
+import { AppError } from "./lib/error";
+import { badRequest } from "./lib/response";
 
 export const buildApp = (): FastifyInstance => {
     
@@ -38,6 +41,22 @@ export const buildApp = (): FastifyInstance => {
     // Global error handler
     app.setErrorHandler((error, req, reply) => {
         logError("Something went wrong! -> ", error);
+
+        if (error instanceof ZodError) {
+            return badRequest(reply, "Invalid data", error.issues);
+        }
+
+        if (error instanceof AppError) {
+            return reply.status(error.statusCode).send({
+                success: false,
+                error: {
+                    message: error.message,
+                    details: error.details,
+                }
+            });
+        }
+
+        // Unknown errors
         return reply.status(500).send({
             success: false,
             error: {
