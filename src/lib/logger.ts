@@ -1,10 +1,16 @@
-export enum LogLevel {
+enum LogLevel {
   Info = "INFO",
   Error = "ERROR",
   Success = "SUCCESS",
   Failure = "FAILURE",
 }
 
+/**
+ * Helper function to log information
+ * @param level Log level - [INFO, ERROR, SUCCESS, FAILURE]
+ * @param msg Log message
+ * @param data Option, Log data / error if any
+ */
 const printLog = (level: LogLevel, msg: string, data?: unknown) => {
   const timestamp = new Date().toISOString();
   if (data !== undefined) {
@@ -14,18 +20,38 @@ const printLog = (level: LogLevel, msg: string, data?: unknown) => {
   }
 };
 
+/**
+ * Helper function to Log INFO events
+ * @param msg Log message
+ * @param data Log data
+ */
 export const logInfo = (msg: string, data?: unknown) => {
   printLog(LogLevel.Info, msg, data);
 };
 
+/**
+ * Helper function to Log ERROR events
+ * @param msg Log message
+ * @param data Log data
+ */
 export const logError = (msg: string, data?: unknown) => {
   printLog(LogLevel.Error, msg, data);
 };
 
+/**
+ * Helper function to Log SUCCESS events
+ * @param msg Log message
+ * @param data Log data
+ */
 export const logSuccess = (msg: string, data?: unknown) => {
   printLog(LogLevel.Success, msg, data);
 };
 
+/**
+ * Helper function to Log FAILURE events
+ * @param msg Log message
+ * @param data Log data
+ */
 export const logFailure = (msg: string, data?: unknown) => {
   printLog(LogLevel.Failure, msg, data);
 };
