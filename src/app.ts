@@ -1,10 +1,13 @@
 import { fastify, type FastifyInstance } from "fastify";
 import helmet from "@fastify/helmet";
+import { shutDownPrisma } from "./db/prisma";
+import { logError } from "./lib/logger";
+import { shutDownRedis } from "./db/redis";
 
 export const buildApp = (): FastifyInstance => {
     
     const app = fastify({
-        logger: true
+        logger: true,
     });
 
     // Security plugins
@@ -13,6 +16,12 @@ export const buildApp = (): FastifyInstance => {
     app.get('/health', () => {
         return {status: 'ok', uptime: process.uptime()};
     });
+
+    // OnClose
+    app.addHook('onClose', async () => {
+        await shutDownPrisma();
+        await shutDownRedis();
+    })
 
     // 404 handler
     app.setNotFoundHandler((req, reply) => {
@@ -28,7 +37,7 @@ export const buildApp = (): FastifyInstance => {
 
     // Global error handler
     app.setErrorHandler((error, req, reply) => {
-        app.log.error(error);
+        logError("Something went wrong! -> ", error);
         return reply.status(500).send({
             success: false,
             error: {

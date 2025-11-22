@@ -1,9 +1,8 @@
-// ESM
-import Fastify from 'fastify';
-import { Pool } from 'pg';
-import { createClient } from 'redis';
 import { buildApp } from './app';
 import { config } from './config/env.config';
+import { initPrisma } from './db/prisma';
+import { initRedis } from './db/redis';
+import { logError, logSuccess } from './lib/logger';
 
 const app = buildApp();
 
@@ -48,12 +47,16 @@ const app = buildApp();
  */
 const start = async () => {
   try {
-    // await redisClient.connect();
-    app.log.info('Connected to Redis');
+    await initPrisma();
+    logSuccess("Prisma connected!");
+
+    await initRedis();
+    logSuccess("Redis connected!");
 
     await app.listen({ port: config.PORT, host: '0.0.0.0' })
+    logSuccess("Server started!");
   } catch (err) {
-    app.log.error(err)
+    logError("While starting server => ", err);
     process.exit(1)
   }
 }

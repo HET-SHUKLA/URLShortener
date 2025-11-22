@@ -9,6 +9,9 @@ WORKDIR /usr/src/app
 
 # Install dependencies first (with caching)
 COPY package*.json ./
+
+# It won't work in dev, since we are using volumes to mount source code
+# After adding new dependencies, run `docker compose run --rm --user root server npm i`
 RUN npm install
 
 # Copy source files AFTER dependencies
