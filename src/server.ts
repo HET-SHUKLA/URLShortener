@@ -1,8 +1,8 @@
-import { buildApp } from './app';
-import { config } from './config/env.config';
-import { initPrisma } from './db/prisma';
-import { initRedis } from './db/redis';
-import { logError, logSuccess } from './lib/logger';
+import { buildApp } from "./app";
+import { config } from "./config/env.config";
+import { initPrisma } from "./db/prisma";
+import { initRedis } from "./db/redis";
+import { logError, logSuccess } from "./lib/logger";
 
 const app = buildApp();
 
@@ -53,11 +53,11 @@ const start = async () => {
     await initRedis();
     logSuccess("Redis connected!");
 
-    await app.listen({ port: config.PORT, host: '0.0.0.0' })
+    await app.listen({ port: config.PORT, host: "0.0.0.0" });
     logSuccess("Server started!");
   } catch (err) {
     logError("While starting server => ", err);
-    process.exit(1)
+    process.exit(1);
   }
-}
+};
 start();

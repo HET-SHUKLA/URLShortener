@@ -7,10 +7,10 @@ import { FastifyReply } from "fastify";
  * @returns FastifyReply with status and data
  */
 export function ok<T>(reply: FastifyReply, data: T) {
-    return reply.status(200).send({
-        success: true,
-        data,
-    });
+  return reply.status(200).send({
+    success: true,
+    data,
+  });
 }
 
 /**
@@ -20,10 +20,10 @@ export function ok<T>(reply: FastifyReply, data: T) {
  * @returns FastifyReply with status and data
  */
 export function created<T>(reply: FastifyReply, data: T) {
-    return reply.status(201).send({
-        success: true,
-        data,
-    });
+  return reply.status(201).send({
+    success: true,
+    data,
+  });
 }
 
 /**
@@ -33,10 +33,13 @@ export function created<T>(reply: FastifyReply, data: T) {
  * @param details Optional, Error details
  * @returns FastifyReply with status and data
  */
-export function badRequest(reply: FastifyReply, message: string, details?: unknown) {
-    return reply.status(400).send({
-        success: false,
-        error: { message, details },
-    });
+export function badRequest(
+  reply: FastifyReply,
+  message: string,
+  details?: unknown,
+) {
+  return reply.status(400).send({
+    success: false,
+    error: { message, details },
+  });
 }
-

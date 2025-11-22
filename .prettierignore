@@ -1,0 +1,31 @@
+# Node.js specific
+node_modules/
+dist/
+build/
+coverage/
+
+# Dotfiles
+.env
+.env.*
+.DS_Store
+
+# Log files
+*.log
+
+# Test snapshots
+*.snap
+
+# Minified files
+*.min.js
+
+# .md files
+*.md
+
+# yml / yaml files
+*.yml
+*.yaml
+
+# Prisma files
+prisma/**
+*.prisma
+generated/
