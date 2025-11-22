@@ -2,8 +2,8 @@
 import Fastify from 'fastify';
 import { Pool } from 'pg';
 import { createClient } from 'redis';
-import { buildApp } from './app.js';
-import { config } from './config/env.config.js';
+import { buildApp } from './app';
+import { config } from './config/env.config';
 
 const app = buildApp();
 

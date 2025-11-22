@@ -39,7 +39,7 @@ const parsed = envSchema.safeParse(process.env);
 
 if(!parsed.success){
     console.error("----------- ENVIRONMENT VARIABLE NOT FOUND -----------");
-    console.error(parsed.error.format());
+    console.error(parsed.error);
     console.error("Exiting...!");
     process.exit(1);
 }
