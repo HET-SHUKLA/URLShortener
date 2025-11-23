@@ -8,10 +8,16 @@ const adapter = new PrismaPg({ connectionString });
 
 export const prisma = new PrismaClient({ adapter });
 
+/**
+ * Initialize Prisma
+ */
 export async function initPrisma() {
   await prisma.$connect();
 }
 
+/**
+ * Shutdown Prisma
+ */
 export async function shutDownPrisma() {
   await prisma.$disconnect();
 }

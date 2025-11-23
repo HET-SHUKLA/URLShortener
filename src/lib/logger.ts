@@ -3,11 +3,12 @@ enum LogLevel {
   Error = "ERROR",
   Success = "SUCCESS",
   Failure = "FAILURE",
+  Debug = "DEBUG",
 }
 
 /**
  * Helper function to log information
- * @param level Log level - [INFO, ERROR, SUCCESS, FAILURE]
+ * @param level Log level - [INFO, ERROR, SUCCESS, FAILURE, DEBUG]
  * @param msg Log message
  * @param data Option, Log data / error if any
  */
@@ -55,3 +56,13 @@ export const logSuccess = (msg: string, data?: unknown) => {
 export const logFailure = (msg: string, data?: unknown) => {
   printLog(LogLevel.Failure, msg, data);
 };
+
+/**
+ * Helper function to Log DEBUG events
+ * @param msg Log message
+ * @param data Log data
+ */
+export const logDebug = (msg: string, data?: unknown) => {
+  console.debug(`[${new Date().toISOString()}] [${LogLevel.Debug}] ${msg}`, data ?? "");
+};
+

@@ -1,11 +1,11 @@
 import { fastify, type FastifyInstance } from "fastify";
 import helmet from "@fastify/helmet";
-import { shutDownPrisma } from "./db/prisma";
+import { prisma, shutDownPrisma } from "./db/prisma";
 import { logError } from "./lib/logger";
-import { shutDownRedis } from "./db/redis";
+import { get, redis, set, shutDownRedis } from "./db/redis";
 import { ZodError } from "zod";
-import { AppError } from "./lib/error";
-import { badRequest } from "./lib/response";
+import { AppError, AuthError, NotFoundError, ValidationError } from "./lib/error";
+import { badRequest, ok } from "./lib/response";
 
 export const buildApp = (): FastifyInstance => {
   const app = fastify({
@@ -15,9 +15,40 @@ export const buildApp = (): FastifyInstance => {
   // Security plugins
   app.register(helmet);
 
-  app.get("/health", () => {
+  // Testing routes
+  app.get("/api/v1/health", () => {
     return { status: "ok", uptime: process.uptime() };
   });
+
+  app.get("/api/v1/prisma", async (req, reply) => {
+    try{
+      const users = await prisma.user.findMany();
+      return ok(reply, users);
+    } catch (e) {
+      throw new NotFoundError("No User found");
+    }
+  });
+
+  app.get("/api/v1/redis", async (req, reply) => {
+    await set("test", "Test-Value", 60);
+    const redisRes = await get("test");
+    return ok(reply, redisRes);
+  });
+
+  app.get<{
+    Params: {type: string}
+  }>("/api/v1/error/:type", (req, reply) => {
+    const {type} = req.params;
+    if (type === "zod") throw new ZodError([]);
+    if (type === "auth") throw new AuthError("Auth error");
+    if (type === "validation") throw new ValidationError("Validation error", {error: "ERROR"});
+    if (type === "notfound") throw new NotFoundError("Not Found error");
+    throw new NotFoundError();
+  });
+
+  app.get("/api/v1/error-auth", () => {
+    throw new AuthError("Authentication Error")
+  })
 
   // OnClose
   app.addHook("onClose", async () => {
