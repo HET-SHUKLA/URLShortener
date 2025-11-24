@@ -1,14 +1,20 @@
-// Discover Docker containers
+// Discover all Docker containers
 discovery.docker "linux" {
   host = "unix:///var/run/docker.sock"
 }
 
-// Create a "service" label from container name
-discovery.relabel "logs_docker" {
-  // We only use this component for its relabel_rules export,
-  // so we don't actually need to modify any discovery targets here.
-  targets = []
+// Relabel Docker metadata into useful labels (container, service)
+discovery.relabel "docker_targets" {
+  targets = discovery.docker.linux.targets
 
+  // container: postgres_db, redis_db, url_shortener_backend, etc.
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.*)"
+    target_label  = "container"
+  }
+
+  // service: same as container for now
   rule {
     source_labels = ["__meta_docker_container_name"]
     regex         = "/(.*)"
@@ -16,18 +22,48 @@ discovery.relabel "logs_docker" {
   }
 }
 
-// Write logs to Loki
+// Where to send logs in Loki
 loki.write "local" {
   endpoint {
     url = "http://loki:3100/loki/api/v1/push"
   }
 }
 
-// Scrape logs from ALL Docker containers and send to Loki
-loki.source.docker "docker_logs" {
-  host         = "unix:///var/run/docker.sock"
-  targets      = discovery.docker.linux.targets
-  labels       = { platform = "docker" }
-  relabel_rules = discovery.relabel.logs_docker.rules
-  forward_to   = [loki.write.local.receiver]
+// Process logs: JSON-parse ONLY url_shortener_backend, pass others through
+loki.process "docker_logs" {
+  forward_to = [loki.write.local.receiver]
+
+  // Only match logs from your backend container
+  stage.match {
+    selector = "{container=\"url_shortener_backend\"}"
+
+    // Parse Pino JSON
+    stage.json {
+      expressions = {
+        level   = "level",
+        service = "service",
+        env     = "env",
+        reqId   = "reqId",
+        msg     = "msg",
+      }
+    }
+
+    // Turn extracted fields into labels
+    stage.labels {
+      values = {
+        service = "",  // label `service` from extracted `service` ("url_shortener-api")
+        level   = "",  // label `level` from extracted `level` (30, 50, ...)
+        env     = "",  // label `env` from extracted `env`
+      }
+    }
+  }
+}
+
+// Scrape logs from ALL Docker containers and send to processor
+loki.source.docker "docker" {
+  host          = "unix:///var/run/docker.sock"
+  targets       = discovery.relabel.docker_targets.output
+  labels        = { platform = "docker" }
+  relabel_rules = discovery.relabel.docker_targets.rules
+  forward_to    = [loki.process.docker_logs.receiver]
 }
