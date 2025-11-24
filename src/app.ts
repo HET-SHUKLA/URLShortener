@@ -2,14 +2,17 @@ import { fastify, type FastifyInstance } from "fastify";
 import helmet from "@fastify/helmet";
 import { prisma, shutDownPrisma } from "./db/prisma";
 import { logError } from "./lib/logger";
-import { get, redis, set, shutDownRedis } from "./db/redis";
+import { get, set, shutDownRedis } from "./db/redis";
 import { ZodError } from "zod";
 import { AppError, AuthError, NotFoundError, ValidationError } from "./lib/error";
 import { badRequest, ok } from "./lib/response";
+import { config } from "./config/env.config";
 
 export const buildApp = (): FastifyInstance => {
   const app = fastify({
-    logger: true,
+    logger: {
+      level: config.LOG_LEVEL,
+    },
   });
 
   // Security plugins

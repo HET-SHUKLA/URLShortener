@@ -34,6 +34,8 @@ const envSchema = z.object({
   }),
 
   DATABASE_URL_LOCALHOST: z.string().optional(),
+
+  LOG_LEVEL: z.string().default("info"),
 });
 
 const parsed = envSchema.safeParse(process.env);
