@@ -1,0 +1,33 @@
+// Discover Docker containers
+discovery.docker "linux" {
+  host = "unix:///var/run/docker.sock"
+}
+
+// Create a "service" label from container name
+discovery.relabel "logs_docker" {
+  // We only use this component for its relabel_rules export,
+  // so we don't actually need to modify any discovery targets here.
+  targets = []
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.*)"
+    target_label  = "service"
+  }
+}
+
+// Write logs to Loki
+loki.write "local" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
+
+// Scrape logs from ALL Docker containers and send to Loki
+loki.source.docker "docker_logs" {
+  host         = "unix:///var/run/docker.sock"
+  targets      = discovery.docker.linux.targets
+  labels       = { platform = "docker" }
+  relabel_rules = discovery.relabel.logs_docker.rules
+  forward_to   = [loki.write.local.receiver]
+}

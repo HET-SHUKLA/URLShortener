@@ -481,3 +481,499 @@ My suggestion:
 * Then wire both `auth.routes` and `urls.routes` in `app.ts`.
 
 When you hit your **first concrete bug or confusion while coding**, bring that back and we’ll debug *that*, not the whole architecture again.
+
+
+--- -------- --------------- ----------------
+
+You’re wiring up a decent stack here; you just need to actually understand what each moving part is doing instead of cargo-culting the compose. I’ll break it down and call out where you’re doing fine vs where you’re being sloppy for a “most professional” app.
+
+---
+
+## Big picture
+
+This `docker-compose` is running 3 containers:
+
+* **Loki** – log storage and query engine
+* **Grafana** – dashboard UI for Loki (and other data sources)
+* **Alloy** – log agent that reads your Docker logs and ships them to Loki
+
+Plus you’ve seen a `volumes:` block like:
+
+```yaml
+volumes:
+  pgdata:
+  redisdata:
+```
+
+which is about **named Docker volumes**, not the same as your bind-mounted config files.
+
+Now let’s go line by line.
+
+---
+
+## 1. Loki service
+
+```yaml
+loki:
+  image: grafana/loki:latest
+  container_name: loki
+  ports:
+    - "3100:3100"
+  command: -config.file=/etc/loki/config/loki-config.yml
+  volumes:
+    - ./observability/loki-config.yml:/etc/loki/config/loki-config.yml
+    - ./observability/loki-data:/loki
+```
+
+### a) What does `command` do here?
+
+```yaml
+command: -config.file=/etc/loki/config/loki-config.yml
+```
+
+* Every Docker image has a default `CMD` or `ENTRYPOINT`.
+* For Loki, the default is something like: `loki -config.file=/etc/loki/local-config.yaml` (or similar).
+* In `docker-compose`, `command:` **overrides the image’s `CMD`**.
+
+Here, you’re telling Loki:
+
+> Start Loki, and use this specific config file path: `/etc/loki/config/loki-config.yml`.
+
+The Loki binary inside the container receives that as a CLI argument: `-config.file=...`.
+
+If this path is wrong or the file is invalid YAML, Loki will either crash or start with errors. So this line is critical.
+
+---
+
+### b) Why are there 2 volumes?
+
+```yaml
+volumes:
+  - ./observability/loki-config.yml:/etc/loki/config/loki-config.yml
+  - ./observability/loki-data:/loki
+```
+
+These are **bind mounts**, not named volumes.
+
+1. **Config file mount**
+
+   ```yaml
+   ./observability/loki-config.yml:/etc/loki/config/loki-config.yml
+   ```
+
+   * Left side: file on your **host** (`./observability/loki-config.yml`)
+   * Right side: file **inside container** (`/etc/loki/config/loki-config.yml`)
+   * Purpose: so you can edit the config on the host and have Loki pick it up (after restart) without rebuilding the image.
+
+   This is likely where you define:
+
+   * Loki server settings
+   * retention policies
+   * storage backend
+   * labels/streams configuration
+
+   That file **is** your Loki configuration. That’s what `loki-config.yml` is.
+
+2. **Data directory mount**
+
+   ```yaml
+   ./observability/loki-data:/loki
+   ```
+
+   * Left: directory on your **host** where Loki will store chunks/indexes.
+   * Right: directory **inside the container** where Loki expects to write data (`/loki`).
+
+   Without this, Loki’s data would live inside the container’s writable layer – and vanish when you recreate the container.
+
+**So:**
+
+* Volume 1 = configuration in Git.
+* Volume 2 = persisted log data.
+
+Two very different concerns. Both are necessary if you want durability + configurability.
+
+---
+
+## 2. Grafana service
+
+```yaml
+grafana:
+  image: grafana/grafana:latest
+  container_name: grafana
+  ports:
+    - "3001:3000"
+  environment:
+    - GF_SECURITY_ADMIN_USER=admin
+    - GF_SECURITY_ADMIN_PASSWORD=admin
+  depends_on:
+    - loki
+```
+
+### a) Why is the port mapping different?
+
+```yaml
+ports:
+  - "3001:3000"
+```
+
+Docker format is: `HOST:CONTAINER`.
+
+* **Container** runs Grafana on `3000` internally.
+* You expose it on the **host** as `3001`.
+
+So you access it at: `http://localhost:3001` (host) but inside Docker network, other containers talk to it as `http://grafana:3000`.
+
+Why? Usually:
+
+* To avoid clashing with another app on port `3000` on your host (React dev server, other service).
+* Or just preference.
+
+Nothing magical. If you want host port `3000`, you’d write `"3000:3000"`.
+
+---
+
+### b) Should username/password come from `.env`?
+
+Right now:
+
+```yaml
+environment:
+  - GF_SECURITY_ADMIN_USER=admin
+  - GF_SECURITY_ADMIN_PASSWORD=admin
+```
+
+This **works**, but:
+
+* It’s dumb for anything beyond local dev:
+
+  * Credentials are inside version control.
+  * Every dev/test/prod environment will share the same hardcoded admin/admin unless overridden.
+
+For production-ish setups, you have two better options:
+
+1. **`.env` file + variable expansion**
+
+   ```yaml
+   env_file:
+     - .env
+   ```
+
+   And in `.env`:
+
+   ```env
+   GF_SECURITY_ADMIN_USER=admin
+   GF_SECURITY_ADMIN_PASSWORD=super-secure-password
+   ```
+
+   Or use:
+
+   ```yaml
+   environment:
+     GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER}
+     GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
+   ```
+
+2. **Secrets / external secret manager** (when you’re serious: Vault, SSM, etc.)
+
+So yeah – for a “professional” setup, credentials should come from environment variables or secrets, not hard-coded in compose. But Docker doesn’t **require** `.env`. It’s just the sane way.
+
+---
+
+## 3. Alloy service
+
+```yaml
+alloy:
+  image: grafana/alloy:latest
+  container_name: alloy
+  command: >
+    run /etc/alloy/config.alloy
+  volumes:
+    - ./observability/config.alloy:/etc/alloy/config.alloy
+    - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    - /var/log:/var/log:ro
+  depends_on:
+    - loki
+```
+
+### a) What does `command` do here?
+
+```yaml
+command: >
+  run /etc/alloy/config.alloy
+```
+
+The `>` is YAML multiline folding, so this becomes:
+
+```yaml
+command: run /etc/alloy/config.alloy
+```
+
+Meaning: when the container starts, it executes:
+
+```bash
+alloy run /etc/alloy/config.alloy
+```
+
+(or whatever the ENTRYPOINT is internally).
+
+* `run` is the subcommand for Alloy to read that config.
+* `/etc/alloy/config.alloy` is your Alloy config file, which defines:
+
+  * where to read logs from
+  * where to send them (Loki endpoint)
+  * what labels / transforms to apply
+
+---
+
+### b) Why 3 volumes?
+
+```yaml
+volumes:
+  - ./observability/config.alloy:/etc/alloy/config.alloy
+  - /var/lib/docker/containers:/var/lib/docker/containers:ro
+  - /var/log:/var/log:ro
+```
+
+Each has a specific job:
+
+1. **Config file mount**
+
+   ```yaml
+   ./observability/config.alloy:/etc/alloy/config.alloy
+   ```
+
+   Same idea as Loki:
+
+   * You own the config file in your repo.
+   * Container reads it from a fixed path.
+
+2. **Docker container logs**
+
+   ```yaml
+   /var/lib/docker/containers:/var/lib/docker/containers:ro
+   ```
+
+   * This is where Docker stores JSON log files for containers on the host.
+   * Alloy reads these log files and scrapes logs from them.
+   * `:ro` means read-only – Alloy can’t screw up the files.
+
+3. **Host log directory**
+
+   ```yaml
+   /var/log:/var/log:ro
+   ```
+
+   * Standard Linux log dir.
+   * In case you want Alloy to scrape system logs (`syslog`, `auth.log`, etc.).
+
+So Alloy is effectively reading logs from:
+
+* other containers (via `/var/lib/docker/containers`)
+* OS logs (via `/var/log`)
+
+…and shipping them to Loki according to your `config.alloy`.
+
+If you don’t care about host logs, you could drop the `/var/log` mount and just keep Docker container logs.
+
+---
+
+## 4. What is this `volumes: pgdata: redisdata:` thing?
+
+You said:
+
+```yaml
+volumes:
+  pgdata:
+  redisdata:
+```
+
+This is at the **top level** of `docker-compose.yml`, like:
+
+```yaml
+version: "3.9"
+
+services:
+  # ...
+  postgres:
+    image: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  redis:
+    image: redis
+    volumes:
+      - redisdata:/data
+
+volumes:
+  pgdata:
+  redisdata:
+```
+
+### What is it?
+
+This defines **named Docker volumes** managed by Docker itself, not bind mounts to your local filesystem.
+
+* `pgdata` is a named volume.
+* `redisdata` is a named volume.
+
+These are referenced inside services like:
+
+```yaml
+volumes:
+  - pgdata:/var/lib/postgresql/data
+```
+
+The left side is just a **name**, Docker handles where it actually lives on disk.
+
+### Should Loki/Grafana/Alloy volumes be declared there too?
+
+Right now, you’re using **bind mounts**, like:
+
+```yaml
+- ./observability/loki-config.yml:/etc/loki/config/loki-config.yml
+- ./observability/loki-data:/loki
+```
+
+For bind mounts:
+
+* You **do not** need to declare them under the top-level `volumes:` block.
+* Those are just host paths.
+
+Top-level `volumes:` is only for **named volumes**, like:
+
+```yaml
+volumes:
+  loki-data:
+  grafana-storage:
+```
+
+If you want to be more “professional” and environment-agnostic, you may want to:
+
+* Use **named volumes** for **data** (so your compose doesn’t depend on specific host directories).
+* Keep **config files** as bind mounts (because you want them version-controlled and readable).
+
+Example:
+
+```yaml
+services:
+  loki:
+    volumes:
+      - ./observability/loki-config.yml:/etc/loki/config/loki-config.yml
+      - loki-data:/loki
+
+  grafana:
+    volumes:
+      - grafana-data:/var/lib/grafana
+
+volumes:
+  loki-data:
+  grafana-data:
+```
+
+So: **No**, you don’t “have to” mention Loki/Alloy/Grafana volumes there unless you switch from bind mounts to named volumes.
+
+---
+
+## You said: “most professional app” + observability with Pino + Fastify
+
+Right now you’re halfway there. You have a stack, but professionalism will come from:
+
+### 1. Stop using `:latest` everywhere
+
+In production this is a trap.
+
+Use pinned versions like:
+
+```yaml
+image: grafana/loki:3.1.0
+image: grafana/grafana:11.2.0
+image: grafana/alloy:1.0.0
+```
+
+That gives you reproducibility. Otherwise a random `docker-compose pull` can break your environment.
+
+---
+
+### 2. Make your logs **structured and labeled properly**
+
+Since you’re using Fastify + Pino:
+
+* Ensure logs are JSON (Pino already does that by default).
+* Make sure Alloy is parsing JSON logs, not treating everything as plain text.
+
+  * In `config.alloy`, parse Pino JSON and map fields like:
+
+    * `level` -> `severity`
+    * `reqId` / `requestId`
+    * `service` name
+* Add **correlation IDs** to your Fastify requests and log them:
+
+  * So you can query in Loki: `{app="my-service", trace_id="..."}`
+* Use labels carefully:
+
+  * Avoid putting high-cardinality stuff (user ID, request ID) as labels.
+  * Those should go in **log fields**, not Loki labels.
+  * Labels should be stable dimensions: `service`, `env`, `version`, `host`.
+
+If you screw this up, Loki will get slow and expensive.
+
+---
+
+### 3. Grafana: do more than just “have it running”
+
+You want:
+
+* Dashboards for:
+
+  * request count / latency / error rate (aggregated from logs)
+  * log volume by service
+* Pre-built queries for:
+
+  * “Show all errors from fastify in last 15 min”
+  * “Show all logs for a given `requestId`”
+
+Also set up:
+
+* **Alerting** (email/Slack/whatever) from Grafana based on Loki queries.
+
+  * e.g. error rate > X for N minutes.
+
+Just running Grafana with admin/admin is not “professional”. It’s a toy.
+
+---
+
+### 4. Secure & externalize configuration
+
+If you want to act like you’re shipping something serious:
+
+* Move secrets (Grafana admin password, Loki auth if any) out of compose into:
+
+  * `.env` (for local/dev)
+  * Secret manager in prod.
+* Don’t check `.env` into git. Obviously.
+
+---
+
+### TL;DR blunt version
+
+* Loki:
+
+  * `command` is just “use this config file”.
+  * Two volumes = one config, one data. That’s correct.
+* Grafana:
+
+  * `3001:3000` = host 3001 → container 3000. Nothing weird.
+  * Hardcoding admin/admin is acceptable for local-only, but lazy and insecure for anything else; move to env/secret.
+* Alloy:
+
+  * `run /etc/alloy/config.alloy` tells it which config to use.
+  * 3 volumes because it needs: config, Docker logs, and optionally host logs.
+* `volumes: pgdata: redisdata:` is for **named volumes**, not the bind-mounted paths you’re using for Loki/Alloy.
+
+  * You only declare things there if you want Docker-managed named volumes.
+  * No need to declare bind-mounts like `./observability/...`.
+
+If you want, next we can design:
+
+* A sane `config.alloy` for scraping Pino logs from your Fastify containers.
+* A minimal-but-serious Loki config (retention, labels).
+* A couple of Grafana LogQL queries that actually support debugging and incident response.

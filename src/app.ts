@@ -7,11 +7,16 @@ import { ZodError } from "zod";
 import { AppError, AuthError, NotFoundError, ValidationError } from "./lib/error";
 import { badRequest, ok } from "./lib/response";
 import { config } from "./config/env.config";
+import { env } from "process";
 
 export const buildApp = (): FastifyInstance => {
   const app = fastify({
     logger: {
       level: config.LOG_LEVEL,
+      base: {
+        service: "url_shortener-api",
+        env: config.NODE_ENV,
+      },
     },
   });
 
@@ -19,12 +24,14 @@ export const buildApp = (): FastifyInstance => {
   app.register(helmet);
 
   // Testing routes
-  app.get("/api/v1/health", () => {
+  app.get("/api/v1/health", (req) => {
+    req.log.info("[INFO] HEALTH LOG");
     return { status: "ok", uptime: process.uptime() };
   });
 
   app.get("/api/v1/prisma", async (req, reply) => {
     try{
+      req.log.info("[INFO] PRISMA LOG")
       const users = await prisma.user.findMany();
       return ok(reply, users);
     } catch (e) {
@@ -33,6 +40,7 @@ export const buildApp = (): FastifyInstance => {
   });
 
   app.get("/api/v1/redis", async (req, reply) => {
+    req.log.info("[INFO] REDIS LOG")
     await set("test", "Test-Value", 60);
     const redisRes = await get("test");
     return ok(reply, redisRes);
@@ -42,6 +50,7 @@ export const buildApp = (): FastifyInstance => {
     Params: {type: string}
   }>("/api/v1/error/:type", (req, reply) => {
     const {type} = req.params;
+    req.log.error("[ERROR] ERROR LOG")
     if (type === "zod") throw new ZodError([]);
     if (type === "auth") throw new AuthError("Auth error");
     if (type === "validation") throw new ValidationError("Validation error", {error: "ERROR"});
