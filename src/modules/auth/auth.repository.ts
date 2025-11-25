@@ -1,6 +1,4 @@
-import { UUID } from 'node:crypto';
 import { prisma } from '../../db/prisma';
-import { AuthProvider } from '../../generated/prisma/enums';
 import { verifyPassword } from '../../lib/password';
 import { NotFoundError } from '../../lib/error';
 
