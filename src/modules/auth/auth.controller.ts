@@ -8,7 +8,10 @@ export const handleUserAuthWithEmail = async (req: FastifyRequest, reply: Fastif
     const response = await authenticateUserWithEmail(body);
     if (response) {
         // TODO: Need to return Authorized response
-        return ok(reply, response);
+        return ok(reply, {
+            email: response.email,
+            userId: response.userId
+        });
     }
 
     // TODO: For testing purposes, Need to return Unauthorized.

@@ -1,6 +1,5 @@
 import { prisma } from '../../db/prisma';
-import { verifyPassword } from '../../lib/password';
-import { NotFoundError } from '../../lib/error';
+import { UserAuthDTO } from './auth.types';
 
 // Not in v1.0.0
 // export const createAuthUser = async (params: {
@@ -49,20 +48,10 @@ import { NotFoundError } from '../../lib/error';
 //     return auth;
 // };
 
-export const authUserEmail = async (email: string, password: string): Promise<boolean> => {
-    const user = await prisma.userAuth.findUnique({
+export const findUserAuthByEmail = async (email: string) => {
+    return await prisma.userAuth.findUnique({
         where: {
             email,
         },
     });
-
-    if (!user) {
-        throw new NotFoundError(`User with email id: ${email}, does not exists!`);
-    }
-
-    if (!user.password) {
-        return false;
-    }
-
-    return verifyPassword(password, user.password);
 };

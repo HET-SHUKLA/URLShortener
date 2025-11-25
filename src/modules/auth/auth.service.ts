@@ -1,6 +1,23 @@
-import { authUserEmail } from "./auth.repository"
-import { UserAuthInput } from "./auth.types";
+import { AuthError } from "../../lib/error";
+import { verifyPassword } from "../../lib/password";
+import { findUserAuthByEmail } from "./auth.repository";
+import { EmailAuthInput } from "./auth.validators";
 
-export const authenticateUserWithEmail = async (param: UserAuthInput): Promise<boolean> => {
-    return await authUserEmail(param.email, param.password);
+export const authenticateUserWithEmail = async (param: EmailAuthInput) => {
+    const record = await findUserAuthByEmail(param.email);
+
+    if (!record || !record.password) {
+        throw new AuthError("Email or Password is invalid!");
+    }
+
+    const isValid = verifyPassword(param.password, record.password);
+
+    if (!isValid) {
+        throw new AuthError("Email or Password is invalid!");
+    }
+
+    return {
+        userId: record.userId,
+        email: record.email,
+    };
 }
