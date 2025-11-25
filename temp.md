@@ -991,7 +991,6 @@ If you want, next we can design:
 Alright, let’s do this in two parts:
 
 1. **A concrete logging strategy for your stack (Fastify + Pino + Loki/Alloy/Grafana)**
-2. **What Quantum Metric is, how it differs from logging, and what Akamai is**
 
 ---
 

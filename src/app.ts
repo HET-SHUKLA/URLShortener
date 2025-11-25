@@ -14,7 +14,7 @@ export const buildApp = (): FastifyInstance => {
     logger: {
       level: config.LOG_LEVEL,
       base: {
-        service: "url_shortener-api",
+        service: "url_shortener_backend",
         env: config.NODE_ENV,
       },
     },
@@ -103,7 +103,7 @@ export const buildApp = (): FastifyInstance => {
       success: false,
       error: {
         message: "Internal Server Error",
-        details: (error as Error)?.message,
+        details: config.NODE_ENV === "development" ? (error as Error)?.message : "",
       },
     });
   });
