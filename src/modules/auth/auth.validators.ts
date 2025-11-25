@@ -9,4 +9,7 @@ export const authSchema = z.object({
     lastSignInAt: z.iso.datetime(),
 });
 
-export type AuthSchema = z.infer<typeof authSchema>;
+export const emailAuthInputSchema = z.object({
+    email: z.email(),
+    password: z.string().min(8),
+});
