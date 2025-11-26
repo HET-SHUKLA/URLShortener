@@ -8,6 +8,7 @@ import { AppError } from "./lib/error";
 import { badRequest, ok } from "./lib/response";
 import { config } from "./config/env.config";
 import healthRoutes from "./modules/health/health.routes";
+import userRoutes from "./modules/users/users.routes";
 
 export const buildApp = (): FastifyInstance => {
   const app = fastify({
@@ -25,6 +26,9 @@ export const buildApp = (): FastifyInstance => {
 
   // Health route
   app.register(healthRoutes, { prefix: "/api/v1/health"});
+
+  // App routes
+  app.register(userRoutes, { prefix: "/api/v1/user"});
 
   // OnClose
   app.addHook("onClose", async () => {
