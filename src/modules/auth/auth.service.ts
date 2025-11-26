@@ -3,7 +3,7 @@ import { verifyPassword } from "../../lib/password";
 import { findUserAuthByEmail } from "./auth.repository";
 import { EmailAuthInput } from "./auth.validators";
 
-export const authenticateUserWithEmail = async (param: EmailAuthInput) => {
+const authenticateUserWithEmail = async (param: EmailAuthInput) => {
     const record = await findUserAuthByEmail(param.email);
 
     if (!record || !record.password) {
@@ -20,4 +20,8 @@ export const authenticateUserWithEmail = async (param: EmailAuthInput) => {
         userId: record.userId,
         email: record.email,
     };
+}
+
+export {
+    authenticateUserWithEmail,
 }

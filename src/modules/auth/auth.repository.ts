@@ -48,10 +48,14 @@ import { UserAuthDTO } from './auth.types';
 //     return auth;
 // };
 
-export const findUserAuthByEmail = async (email: string) => {
+const findUserAuthByEmail = async (email: string) => {
     return await prisma.userAuth.findUnique({
         where: {
             email,
         },
     });
 };
+
+export {
+    findUserAuthByEmail,
+}
