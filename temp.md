@@ -1,3 +1,26 @@
+On GitHub:
+
+/docs folder:
+
+architecture.md (what you did and why)
+
+scaling.md (what would break first, how to evolve to microservices)
+
+load-testing.md (scenarios + results screenshots)
+
+Screenshots:
+
+Grafana charts
+
+Logs
+
+Stress test graphs
+
+openapi.yaml or /swagger.json exposed + linked in README.
+
+That screams backend.
+
+
 # 1
 Good, this is the right time to see **one concrete, clean example** instead of theory.
 
