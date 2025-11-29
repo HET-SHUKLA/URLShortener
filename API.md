@@ -1,4 +1,4 @@
-# API docs
+# API docs (v1)
 
 ## 1. Auth
 ### POST
