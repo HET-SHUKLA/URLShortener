@@ -256,7 +256,7 @@ Content-Type: application/json
 ---
 
 
-#### 5. `POST /auth/reset-password/`
+#### 5. `POST /auth/reset-password/` (v1.1.0)
 > Send reset password email
 
 **Request**
@@ -300,7 +300,7 @@ Content-Type: application/json
 ---
 
 
-#### 6. `POST /auth/reset-password?tokenId=&token=`
+#### 6. `POST /auth/reset-password?tokenId=&token=` (v1.1.0)
 > Send reset password email
 
 **Request**
@@ -616,7 +616,7 @@ Authorization: Bearer <access_token>
 }
 ```
 
-#### 3. `GET /user/verify-email`
+#### 3. `GET /user/verify-email` (v1.1.0)
 > Send email to verify.
 
 **Request**
@@ -663,8 +663,58 @@ Authorization: Bearer <access_token>
 ```
 
 
+#### 4. `GET /user/notifications` (v1.1.0)
+> Get Notifications of User
+
+**Request**
+```
+Authorization: Bearer <access_token>
+```
+
+**Response**
+
+**200 OK**
+```json
+{
+    "status": 200,
+    "message": "Notifications fetched sucessfully",
+    "success": true,
+    "data": {
+        "notifications": [
+            {
+                "notificationId": "12a4a5424a",
+                "type": "PUSH",
+                "content": "a aui auwhd NAJj uiahdh jasdjka A",
+                "success": true, // Notification sent
+                "date": "172345461321",
+            }
+        ]
+    }
+}
+```
+
+**401 Unauthorized**
+```json
+{
+    "status": 401,
+    "error": "Token is expired or invalid",
+    "success": false,
+}
+```
+
+**500 Internal server**
+```json
+{
+    "status": 500,
+    "error": "Something went wrong, Try again after some time",
+    "success": false,
+}
+```
+
+---
+
 ### PATCH
-#### 1. `PATCH /user/notification/:id`
+#### 1. `PATCH /user/notification/:id` (v1.1.0)
 > Make notification mark as read.
 
 **Request**
@@ -712,7 +762,7 @@ Authorization: Bearer <access_token>
 ```
 
 
-#### 2. `PATCH /user/verify-email?tokenId=&token=`
+#### 2. `PATCH /user/verify-email?tokenId=&token=` (v1.1.0)
 > Send email to verify.
 
 **Response**
@@ -794,7 +844,7 @@ Authorization: Bearer <access_token>
 
 ---
 
-#### 2. `DELETE /user/notification/:id`
+#### 2. `DELETE /user/notification/:id` (v1.1.0)
 > Delete notification from database.
 
 **Request**
@@ -847,7 +897,7 @@ Authorization: Bearer <access_token>
 
 ### POST
 #### 1. `POST /url`
-> Get user information from userId.
+> Create short URL.
 
 **Request**
 ```
@@ -908,7 +958,7 @@ Authorization: Bearer <access_token>
 }
 ```
 
-#### 2. `POST /url/:id`
+#### 2. `POST /url/:id` (v1.1.0)
 > Verify URL protection
 
 **Request**
@@ -1142,7 +1192,7 @@ Authorization: Bearer <access_token>
 ```
 
 ### PATCH
-#### 1. `PATCH /url/:id`
+#### 1. `PATCH /url/:id` (v1.1.0)
 > Update URL information from id.
 
 **Request**
@@ -1245,3 +1295,4 @@ Authorization: Bearer <access_token>
     "success": false,
 }
 ```
+
