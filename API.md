@@ -1296,3 +1296,7 @@ Authorization: Bearer <access_token>
 }
 ```
 
+# Future APIs
+## v1.2.0
+- New protection methods Like "APPROVE" or "OTP"
+- Mobile OTP based login
