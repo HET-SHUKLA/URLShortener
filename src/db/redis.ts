@@ -43,6 +43,11 @@ export async function set(key: string, value: RedisArgument, expiration: number)
   }
 }
 
+/**
+ * Get value from key
+ * @param key Redis Key
+ * @returns Value from key
+ */
 export async function get(key: string) {
   try {
     return await redis.get(key);
