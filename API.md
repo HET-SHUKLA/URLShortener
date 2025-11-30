@@ -308,8 +308,9 @@ Authorization: Bearer <access_token>
 
 ---
 
+### DELETE
 
-#### 2. `GET /auth/logout`
+#### 1. `DELETE /auth/logout`
 > Logout user.
 
 **Request**

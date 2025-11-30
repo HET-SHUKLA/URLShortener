@@ -22,13 +22,16 @@ enum AuthProvider {
 enum ProtectionMethod {
   NONE
   PASSWORD
-  OTP
-  APPROVE
 }
 
 enum NotificationType {
   PUSH
   EMAIL
+}
+
+enum VerificationTokenType {
+  EMAIL_VERIFY
+  PASSWORD_RESET
 }
 
 // ===== Models =====
@@ -44,9 +47,11 @@ model User {
   deletedAt       DateTime?
 
   // Relations
-  urls           Url[]
-  notifications  Notification[]
-  user_auth      UserAuth[] 
+  urls               Url[]
+  notifications      Notification[]
+  user_auth          UserAuth[]
+  session            Session[]
+  verification_token VerificationToken[]
 
   @@map("users")
 }
@@ -55,8 +60,9 @@ model User {
 model UserAuth {
   id           String        @id @default(uuid())
   userId       String
-  email        String        @unique
-  authProvider AuthProvider
+  email        String        
+  authProvider AuthProvider  
+  providerId   String?       
   password     String?       // password hash (for EMAIL provider)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
@@ -64,10 +70,48 @@ model UserAuth {
   meta         Json?
 
   // Relations
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_auth")
   @@index([userId])
+  @@unique([authProvider, providerId])
+  @@unique([email, authProvider])
+}
+
+// Table: sessions
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  tokenHash String   @unique // Refresh token
+  userAgent String?
+  ip        String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  revokedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// Table: verification_token
+model VerificationToken {
+  id        String   @id @default(uuid())
+  userId    String
+  tokenHash String   @unique
+  type      String   // 'EMAIL_CONFIRM', 'PASSWORD_RESET', etc.
+  data      Json?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  usedAt    DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("verification_tokens")
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 // Table: urls
@@ -90,7 +134,7 @@ model Url {
   meta               Json?
 
   // Relations
-  owner       User?          @relation(fields: [ownerId], references: [id])
+  owner       User?          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   analytics   UrlAnalytics[]
 
   @@index([ownerId])
@@ -109,7 +153,7 @@ model UrlAnalytics {
   meta       Json?
 
   // Relations
-  url Url @relation(fields: [urlId], references: [id])
+  url Url @relation(fields: [urlId], references: [id], onDelete: Cascade)
 
   @@index([urlId])
   @@index([createdAt])
@@ -121,6 +165,7 @@ model Notification {
   notificationId   String           @id @default(uuid())
   userId           String
   notificationType NotificationType
+  notificationBody String
   isSuccess        Boolean          @default(false)
   createdAt        DateTime         @default(now())
   clickedAt        DateTime?
@@ -129,7 +174,7 @@ model Notification {
   meta             Json?
 
   // Relations
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([createdAt])
