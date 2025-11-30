@@ -255,6 +255,99 @@ Content-Type: application/json
 
 ---
 
+
+#### 5. `POST /auth/reset-password/`
+> Send reset password email
+
+**Request**
+```json
+{
+    "email": "abc@gmail.com",
+    // If given prefix is in allowed list, Then while sending email, Frontend link will be provided otherwise, Simple form page link will be provided.
+    "frotendPrefix?": "abc.com/reset-pass"
+}
+```
+
+**Response**
+
+**200 OK**
+```json
+{
+    "status":200,
+    "message": "Password reset email sent successfully",
+    "success": true,
+}
+```
+
+**400 Invalid data**
+```json
+{
+    "status": 400,
+    "error": "Email does not exists",
+    "success": false,
+}
+```
+
+**500 Internal server**
+```json
+{
+    "status": 500,
+    "error": "Something went wrong, Try again after some time",
+    "success": false,
+}
+```
+
+---
+
+
+#### 6. `POST /auth/reset-password?tokenId=&token=`
+> Send reset password email
+
+**Request**
+```json
+{
+    "newPassword": "as455@sdaA",
+}
+```
+
+**Response**
+
+**200 OK**
+```json
+{
+    "status":200,
+    "message": "Password reseted successfully",
+    "success": true,
+}
+```
+
+**400 Invalid data**
+```json
+{
+    "status": 400,
+    "error": "Password provided does not meet minimum requirement",
+    "success": false,
+}
+```
+
+**401 Unauthorized**
+```json
+{
+    "status": 401,
+    "error": "Token in either invalid or expired",
+    "success": false,
+}
+```
+
+**500 Internal server**
+```json
+{
+    "status": 500,
+    "error": "Something went wrong, Try again after some time",
+    "success": false,
+}
+```
+
 ### GET
 
 #### 1. `GET /auth/me`
@@ -275,6 +368,8 @@ Authorization: Bearer <access_token>
     "success": true,
     "data":{
         "id": "user-id",
+        "email": "abc@gmail.com",
+        "emailVerified": true,
     }
 }
 ```
@@ -308,8 +403,8 @@ Authorization: Bearer <access_token>
 
 ---
 
-### DELETE
 
+### DELETE
 #### 1. `DELETE /auth/logout`
 > Logout user.
 
@@ -335,6 +430,53 @@ Authorization: Bearer <access_token>
 {
     "status": 400,
     "error": "Token is invalid",
+    "success": false,
+}
+```
+
+**401 Unauthorized**
+```json
+{
+    "status": 401,
+    "error": "Token is expired or invalid",
+    "success": false,
+}
+```
+
+**500 Internal server**
+```json
+{
+    "status": 500,
+    "error": "Something went wrong, Try again after some time",
+    "success": false,
+}
+```
+
+#### 2. `DELETE /auth/logout/:sessionId`
+> Logout user from specific session.
+
+**Request**
+```
+Authorization: Bearer <access_token>
+```
+
+**Response**
+
+**200 OK**
+```json
+{
+    // Refresh token will be blacklisted
+    "status":200,
+    "message": "User logged out successfully from given session",
+    "success": true,
+}
+```
+
+**400 Invalid data**
+```json
+{
+    "status": 400,
+    "error": "Session ID is invalid",
     "success": false,
 }
 ```
@@ -395,6 +537,288 @@ Authorization: Bearer <access_token>
 {
     "status": 400,
     "error": "User ID is invalid",
+    "success": false,
+}
+```
+
+**401 Unauthorized**
+```json
+{
+    "status": 401,
+    "error": "Token is expired or invalid",
+    "success": false,
+}
+```
+
+**500 Internal server**
+```json
+{
+    "status": 500,
+    "error": "Something went wrong, Try again after some time",
+    "success": false,
+}
+```
+
+---
+
+#### 2. `GET /user/sessions`
+> Get user sessions
+
+**Request**
+```
+Authorization: Bearer <access_token>
+```
+
+**Response**
+
+**200 OK**
+```json
+{
+    "status":200,
+    "message": "User session fetched successfully",
+    "success": true,
+    "data":{
+        "sessions": [
+            {
+                "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Chrome/124.0.0 Safari/537.36",
+                "ipAddress": "192.168.12.1",
+                "sessionId": "124-aasc-8s-56a-7asd"
+            },
+        ]
+    }
+}
+```
+
+**400 Invalid data**
+```json
+{
+    "status": 400,
+    "error": "User ID is invalid",
+    "success": false,
+}
+```
+
+**401 Unauthorized**
+```json
+{
+    "status": 401,
+    "error": "Token is expired or invalid",
+    "success": false,
+}
+```
+
+**500 Internal server**
+```json
+{
+    "status": 500,
+    "error": "Something went wrong, Try again after some time",
+    "success": false,
+}
+```
+
+#### 3. `GET /user/verify-email`
+> Send email to verify.
+
+**Request**
+```
+Authorization: Bearer <access_token>
+```
+
+**Response**
+
+**200 OK**
+```json
+{
+    "status": 200,
+    "message": "Email sent successfully",
+    "success": true,
+}
+```
+
+**400 Invalid data**
+```json
+{
+    "status": 400,
+    "error": "User ID is invalid",
+    "success": false,
+}
+```
+
+**401 Unauthorized**
+```json
+{
+    "status": 401,
+    "error": "Token is expired or invalid",
+    "success": false,
+}
+```
+
+**500 Internal server**
+```json
+{
+    "status": 500,
+    "error": "Something went wrong, Try again after some time",
+    "success": false,
+}
+```
+
+
+### PATCH
+#### 1. `PATCH /user/notification/:id`
+> Make notification mark as read.
+
+**Request**
+```
+Authorization: Bearer <access_token>
+```
+
+**Response**
+
+**200 OK**
+```json
+{
+    // Refresh token will be blacklisted
+    "status":200,
+    "message": "Notification marked as read",
+    "success": true,
+}
+```
+
+**400 Invalid data**
+```json
+{
+    "status": 400,
+    "error": "Notification ID is invalid",
+    "success": false,
+}
+```
+
+**401 Unauthorized**
+```json
+{
+    "status": 401,
+    "error": "Token is expired or invalid",
+    "success": false,
+}
+```
+
+**500 Internal server**
+```json
+{
+    "status": 500,
+    "error": "Something went wrong, Try again after some time",
+    "success": false,
+}
+```
+
+
+#### 2. `PATCH /user/verify-email?tokenId=&token=`
+> Send email to verify.
+
+**Response**
+
+**200 OK**
+```json
+{
+    "status": 200,
+    "message": "Email verified successfully",
+    "success": true,
+}
+```
+
+**401 Unauthorized**
+```json
+{
+    "status": 401,
+    "error": "Token is expired or invalid",
+    "success": false,
+}
+```
+
+**500 Internal server**
+```json
+{
+    "status": 500,
+    "error": "Something went wrong, Try again after some time",
+    "success": false,
+}
+```
+
+### DELETE
+#### 1. `DELETE /user/me`
+> Delete user from database.
+
+**Request**
+```
+Authorization: Bearer <access_token>
+```
+
+**Response**
+
+**200 OK**
+```json
+{
+    // Refresh token will be blacklisted
+    "status":200,
+    "message": "User deleted successfully! - 30 days to recover",
+    "success": true,
+}
+```
+
+**400 Invalid data**
+```json
+{
+    "status": 400,
+    "error": "User ID is invalid",
+    "success": false,
+}
+```
+
+**401 Unauthorized**
+```json
+{
+    "status": 401,
+    "error": "Token is expired or invalid",
+    "success": false,
+}
+```
+
+**500 Internal server**
+```json
+{
+    "status": 500,
+    "error": "Something went wrong, Try again after some time",
+    "success": false,
+}
+```
+
+---
+
+#### 2. `DELETE /user/notification/:id`
+> Delete notification from database.
+
+**Request**
+```
+Authorization: Bearer <access_token>
+```
+
+**Response**
+
+**200 OK**
+```json
+{
+    // Refresh token will be blacklisted
+    "status":200,
+    "message": "Notification deleted",
+    "success": true,
+}
+```
+
+**400 Invalid data**
+```json
+{
+    "status": 400,
+    "error": "Notification ID is invalid",
     "success": false,
 }
 ```
@@ -547,12 +971,23 @@ Authorization: Bearer <access_token>
 **200 OK**
 ```json
 {
-    "status":200,
+    // If protection method is enable
+    "status": 200,
     "message": "Long URL fetched success fully / Protected URL",
     "success": true,
     "data": {
-        "longUrl": "https//www.google.com", // If protection method is none
+        "protectionMethod": "PASSWORD",
     }
+}
+```
+
+**302 REDIRECT**
+```json
+{
+    // If protection method is null
+    "status": 302,
+    "message": "Redirecting user to original URL",
+    "success": true,
 }
 ```
 
@@ -666,11 +1101,15 @@ Authorization: Bearer <access_token>
     "message": "URL analytics fetched successfully",
     "success": true,
     "data": {
-        "page": 1, // Pagination
-        "success": [true, false, false, true],
-        "ip": ["127.0.0.1", "192.0.0.1", "111.253.25.2"],
-        "method": ["PASSWORD", "PASSWORD", "NONE"],
-        "time": ["1723546245", "215411231"],
+        "stats": [
+            {
+                "page": 1,
+                "success": true,
+                "ip": "127.0.0.1",
+                "method": "PASSWORD",
+                "time": "1723546245",
+            },
+        ]
     }
 }
 ```
@@ -729,6 +1168,53 @@ Authorization: Bearer <access_token>
 {
     "status":200,
     "message": "Data updated successfully",
+    "success": true,
+}
+```
+
+**400 Invalid data**
+```json
+{
+    "status": 400,
+    "error": "Invalid Data",
+    "success": false,
+}
+```
+
+**401 Unauthorized**
+```json
+{
+    "status": 401,
+    "error": "Token is expired or invalid",
+    "success": false,
+}
+```
+
+**500 Internal server**
+```json
+{
+    "status": 500,
+    "error": "Something went wrong, Try again after some time",
+    "success": false,
+}
+```
+
+### DELETE
+#### 1. `DELETE /url/:id`
+> Delete URL.
+
+**Request**
+```
+Authorization: Bearer <access_token>
+```
+
+**Response**
+
+**200 OK**
+```json
+{
+    "status":200,
+    "message": "URL deleted successfully",
     "success": true,
 }
 ```

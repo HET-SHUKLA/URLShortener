@@ -101,7 +101,7 @@ model VerificationToken {
   id        String   @id @default(uuid())
   userId    String
   tokenHash String   @unique
-  type      String   // 'EMAIL_CONFIRM', 'PASSWORD_RESET', etc.
+  type      VerificationTokenType   // 'EMAIL_CONFIRM', 'PASSWORD_RESET', etc.
   data      Json?
   expiresAt DateTime
   createdAt DateTime @default(now())
@@ -122,7 +122,7 @@ model Url {
   ownerId            String?          // FK to users.id
   protectionMethod   ProtectionMethod @default(NONE)
   protectedPassword  String?          // password hash (if PASSWORD protection)
-  isUrlSFW           Boolean          @default(true)
+  isUrlSFW           Boolean          @default(true) // Show page before redirecting only if isUrlSFW is false.
   isAnalyticsEnabled Boolean          @default(true)
   // NOTE: app should set now()+5d / now()+6mo as needed
   expiresAt          DateTime
@@ -170,6 +170,7 @@ model Notification {
   createdAt        DateTime         @default(now())
   clickedAt        DateTime?
   readAt           DateTime?
+  deletedAt        DateTime?
   updatedAt        DateTime         @updatedAt
   meta             Json?
 
