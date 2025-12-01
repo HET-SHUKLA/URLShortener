@@ -9,6 +9,7 @@ import { badRequest, ok } from "./lib/response";
 import { config } from "./config/env.config";
 import healthRoutes from "./modules/health/health.routes";
 import userRoutes from "./modules/users/users.routes";
+import authRoutes from "./modules/auth/auth.routes";
 
 export const buildApp = (): FastifyInstance => {
   const app = fastify({
@@ -29,6 +30,7 @@ export const buildApp = (): FastifyInstance => {
 
   // App routes
   app.register(userRoutes, { prefix: "/api/v1/user"});
+  app.register(authRoutes, { prefix: "/api/v1/auth"});
 
   // OnClose
   app.addHook("onClose", async () => {
