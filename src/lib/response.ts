@@ -6,9 +6,11 @@ import { FastifyReply } from "fastify";
  * @param data Response of a request
  * @returns FastifyReply with status and data
  */
-export function ok<T>(reply: FastifyReply, data: T) {
+export function ok<T>(reply: FastifyReply, message: string, data: T) {
   return reply.status(200).send({
+    status: 200,
     success: true,
+    message,
     data,
   });
 }
@@ -19,9 +21,11 @@ export function ok<T>(reply: FastifyReply, data: T) {
  * @param data Response of a request
  * @returns FastifyReply with status and data
  */
-export function created<T>(reply: FastifyReply, data: T) {
+export function created<T>(reply: FastifyReply, message: string, data: T) {
   return reply.status(201).send({
+    status: 201,
     success: true,
+    message,
     data,
   });
 }
@@ -35,11 +39,12 @@ export function created<T>(reply: FastifyReply, data: T) {
  */
 export function badRequest(
   reply: FastifyReply,
-  message: string,
+  error: string,
   details?: unknown,
 ) {
   return reply.status(400).send({
+    status: 400,
     success: false,
-    error: { message, details },
+    error,
   });
 }

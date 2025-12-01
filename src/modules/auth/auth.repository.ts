@@ -1,5 +1,7 @@
 import { prisma } from '../../db/prisma';
+import { AuthProvider } from '../../generated/prisma/enums';
 import { UserAuthDTO } from './auth.types';
+import { EmailAuthInput } from './auth.validators';
 
 // Not in v1.0.0
 // export const createAuthUser = async (params: {
@@ -56,6 +58,15 @@ const findUserAuthByEmail = async (email: string) => {
     });
 };
 
+const createUserForEmail = async (param: EmailAuthInput, refreshToken: string) => {
+
+    // TODO: transaction to store user in User, UserAuth, Session
+    const userId = "123";
+
+    return userId;
+}
+
 export {
     findUserAuthByEmail,
+    createUserForEmail
 }

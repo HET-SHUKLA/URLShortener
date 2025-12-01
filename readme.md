@@ -1,3 +1,5 @@
+> docker compose exec --user root server /bin/sh -lc "npm ci"
+
 # URL Shortener
 
 Write the short 2-page system design doc now (5–6 bullets).

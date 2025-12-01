@@ -5,8 +5,9 @@ import { AuthProvider } from "../../generated/prisma/enums";
  */
 interface UserAuthDTO {
     id: string,
+    userId: string,
     email: string,
-    authProvider: AuthProvider
+    authProvider: AuthProvider,
     password: string,
     createdAt: Date,
     updatedAt: Date,
@@ -14,6 +15,16 @@ interface UserAuthDTO {
     meta: Object,
 }
 
+/**
+ * User created response
+ */
+interface UserCreatedResponse {
+    id: string,
+    accessToken: string,
+    refreshToken?: string // Only when requested through mobile
+}
+
 export type {
     UserAuthDTO,
+    UserCreatedResponse,
 }

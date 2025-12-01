@@ -1,0 +1,25 @@
+{
+  "name": "URL Shortener Backend",
+  "dockerComposeFile": "../compose.yaml",
+  "service": "server",
+  "workspaceFolder": "/usr/src/app",
+
+  "shutdownAction": "stopCompose",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-typescript-next"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "editor.formatOnSave": true
+      }
+    }
+  },
+
+  "postCreateCommand": "sudo chown -R node:node /usr/src/app && npm ci"
+
+}

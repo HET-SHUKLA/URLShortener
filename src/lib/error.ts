@@ -6,12 +6,12 @@ export class AppError extends Error {
   details?: unknown;
   /**
    * Creates a new AppError instance.
-   * @param message - The error message.
+   * @param error - The error message.
    * @param statusCode - The HTTP status code associated with the error.
    * @param details - Additional details about the error.
    */
-  constructor(message: string, statusCode = 500, details?: unknown) {
-    super(message);
+  constructor(error: string, statusCode = 500, details?: unknown) {
+    super(error);
     this.statusCode = statusCode;
     this.details = details;
   }
@@ -23,10 +23,10 @@ export class AppError extends Error {
 export class NotFoundError extends AppError {
   /**
    * Creates a new NotFoundError instance.
-   * @param message - The error message.
+   * @param error - The error message.
    */
-  constructor(message = "Not Found") {
-    super(message, 404);
+  constructor(error = "Not Found") {
+    super(error, 404);
   }
 }
 
@@ -36,10 +36,10 @@ export class NotFoundError extends AppError {
 export class AuthError extends AppError {
   /**
    * Creates a new AuthError instance.
-   * @param message - The error message.
+   * @param error - The error message.
    */
-  constructor(message = "Unauthorized") {
-    super(message, 401);
+  constructor(error = "Unauthorized") {
+    super(error, 401);
   }
 }
 
@@ -49,10 +49,26 @@ export class AuthError extends AppError {
 export class ValidationError extends AppError {
   /**
    * Creates a new ValidationError instance.
-   * @param message - The error message.
-   * @param details - Additional details about the validation error.
+   * @param error Error message 
+   * @param details Details of the error, If any
    */
-  constructor(message = "Invalid data", details?: unknown) {
-    super(message, 400, details);
+  constructor(error = "Invalid data", details?: unknown) {
+    super(error, 400, details);
+  }
+}
+
+
+/**
+ * Internal server error
+ */
+export class InternalServerError extends AppError {
+
+  /**
+   * Create new InternalServerError instance
+   * @param error Error message 
+   * @param details Details of the error, If any
+   */
+  constructor(error = "Something went wrong, Try again after some time", details?: unknown) {
+    super(error, 500, details);
   }
 }
