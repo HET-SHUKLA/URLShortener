@@ -1,4 +1,4 @@
-import { AuthError } from "../../lib/error";
+import { AuthError, InternalServerError } from "../../lib/error";
 import { hashPassword, verifyPassword } from "../../lib/password";
 import { generateRefreshToken, hashToken, generateAccessToken } from "../../util/tokens";
 import { createUserForEmail, findUserAuthByEmail } from "./auth.repository";
@@ -24,11 +24,11 @@ const authenticateUserWithEmail = async (param: EmailAuthInput) => {
     };
 }
 
-const createUserUsingEmailService = async (param: EmailAuthInput): Promise<UserCreatedResponse | undefined> => {
+const createUserUsingEmailService = async (param: EmailAuthInput): Promise<UserCreatedResponse> => {
     const refreshToken = generateRefreshToken();
 
     if (!refreshToken) {
-        return undefined;
+        throw new InternalServerError();
     }
 
     const hashedRefreshToken = hashToken(refreshToken);
@@ -38,13 +38,13 @@ const createUserUsingEmailService = async (param: EmailAuthInput): Promise<UserC
     const userId = await createUserForEmail(param, hashedRefreshToken);
     
     if (!userId) {
-        return undefined;
+        throw new InternalServerError();
     }
 
     const accessToken = generateAccessToken(userId);
 
     if (!accessToken) {
-        return undefined;
+        throw new InternalServerError();
     }
 
     const response: UserCreatedResponse = {
