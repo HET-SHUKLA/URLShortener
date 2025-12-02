@@ -36,6 +36,18 @@ const envSchema = z.object({
   DATABASE_URL_LOCALHOST: z.string().optional(),
 
   LOG_LEVEL: z.string().default("info"),
+
+  JWT_SECRET: z.string({
+    error: "JWT_SECRET is required",
+  }),
+
+  JWT_EXPIRES_IN: z.number({
+    error: "JWT_EXPIRES_IN required",
+  }),
+
+  COOKIE_SECRET: z.string({
+    error: "COOKIE_SECRET required",
+  }),
 });
 
 const parsed = envSchema.safeParse(process.env);

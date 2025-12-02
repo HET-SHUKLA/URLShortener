@@ -6,6 +6,10 @@
 > To register user through email and password
 
 **Request**
+```
+// HEADER
+X-Client-Type: web
+```
 ```json
 {
     "email": "abc@gmail.com",

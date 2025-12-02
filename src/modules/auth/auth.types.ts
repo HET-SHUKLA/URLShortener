@@ -21,7 +21,7 @@ interface UserAuthDTO {
 interface UserCreatedResponse {
     id: string,
     accessToken: string,
-    refreshToken?: string // Only when requested through mobile
+    refreshToken: string // Only when requested through mobile
 }
 
 export type {

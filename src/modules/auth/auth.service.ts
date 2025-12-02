@@ -1,9 +1,9 @@
 import { AuthError } from "../../lib/error";
 import { verifyPassword } from "../../lib/password";
+import { generateRefreshToken, hashToken, generateAccessToken } from "../../util/tokens";
 import { createUserForEmail, findUserAuthByEmail } from "./auth.repository";
 import { UserCreatedResponse } from "./auth.types";
 import { EmailAuthInput } from "./auth.validators";
-import jsonwebtoken from "jsonwebtoken";
 
 const authenticateUserWithEmail = async (param: EmailAuthInput) => {
     const record = await findUserAuthByEmail(param.email);
@@ -24,32 +24,34 @@ const authenticateUserWithEmail = async (param: EmailAuthInput) => {
     };
 }
 
-const createUserUsingEmailService = async (param: EmailAuthInput): Promise<UserCreatedResponse | boolean> => {
-    //const refreshToken = await generateRefreshToken();
+const createUserUsingEmailService = async (param: EmailAuthInput): Promise<UserCreatedResponse | undefined> => {
+    const refreshToken = generateRefreshToken();
 
-    // if (!refreshToken) {
-    //     return false;
-    // }
+    if (!refreshToken) {
+        return undefined;
+    }
 
-    // const userId = await createUserForEmail(param, refreshToken);
+    const hashedRefreshToken = hashToken(refreshToken);
+
+    const userId = await createUserForEmail(param, hashedRefreshToken);
     
-    // if (!userId) {
-    //     return false;
-    // }
+    if (!userId) {
+        return undefined;
+    }
 
-    //const accessToken = await genearateAccessToken(userId);
+    const accessToken = generateAccessToken(userId);
 
-    // if (!accessToken) {
-    //     return false;
-    // }
+    if (!accessToken) {
+        return undefined;
+    }
 
-    // const response: UserCreatedResponse = {
-    //     id: userId,
-    //     accessToken,
-    //     refreshToken, // Check in controller
-    // };
+    const response: UserCreatedResponse = {
+        id: userId,
+        accessToken,
+        refreshToken,
+    };
 
-    //return response;
+    return response;
 }
 
 export {

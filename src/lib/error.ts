@@ -72,3 +72,18 @@ export class InternalServerError extends AppError {
     super(error, 500, details);
   }
 }
+
+/**
+ * Conflict error
+ */
+export class ConflictError extends AppError {
+
+  /**
+   * Create new ConflictError instance
+   * @param error Error message 
+   * @param details Details of the error, If any
+   */
+  constructor(error = "Conflict error", details?: unknown) {
+    super(error, 409, details);
+  }
+}

@@ -10,6 +10,7 @@ import { config } from "./config/env.config";
 import healthRoutes from "./modules/health/health.routes";
 import userRoutes from "./modules/users/users.routes";
 import authRoutes from "./modules/auth/auth.routes";
+import cookie from "@fastify/cookie";
 
 export const buildApp = (): FastifyInstance => {
   const app = fastify({
@@ -24,6 +25,9 @@ export const buildApp = (): FastifyInstance => {
 
   // Security plugins
   app.register(helmet);
+  app.register(cookie, {
+    secret: config.COOKIE_SECRET,
+  });
 
   // Health route
   app.register(healthRoutes, { prefix: "/api/v1/health"});

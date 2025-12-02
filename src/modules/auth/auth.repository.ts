@@ -1,5 +1,7 @@
 import { prisma } from '../../db/prisma';
+import { Prisma } from '../../generated/prisma/client';
 import { AuthProvider } from '../../generated/prisma/enums';
+import { ConflictError } from '../../lib/error';
 import { UserAuthDTO } from './auth.types';
 import { EmailAuthInput } from './auth.validators';
 
@@ -61,9 +63,16 @@ const findUserAuthByEmail = async (email: string) => {
 const createUserForEmail = async (param: EmailAuthInput, refreshToken: string) => {
 
     // TODO: transaction to store user in User, UserAuth, Session
-    const userId = "123";
+    try {
+        const userId = "123";
+        return userId;
+    } catch (e) {
+        if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
+            throw new ConflictError("User with email is already exists, Please login");
+        }
 
-    return userId;
+        throw e;
+    }
 }
 
 export {
