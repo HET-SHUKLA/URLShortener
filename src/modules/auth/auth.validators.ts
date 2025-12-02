@@ -3,7 +3,7 @@ import { AuthProvider } from "../../generated/prisma/enums";
 
 const authSchema = z.object({
     email: z.email(),
-    authProvide: z.enum(AuthProvider),
+    authProvider: z.enum(AuthProvider),
     // Optional if auth provider is other than email
     password: z.string().min(8).optional(),
 });

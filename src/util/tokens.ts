@@ -15,7 +15,7 @@ const generateAccessToken = (userId: string): string => {
         config.JWT_SECRET,
         {
             expiresIn: config.JWT_EXPIRES_IN,
-            algorithm: "ES256"
+            algorithm: "HS256"
         }
     )
 }

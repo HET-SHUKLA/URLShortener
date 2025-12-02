@@ -1,5 +1,5 @@
 import { AuthError } from "../../lib/error";
-import { verifyPassword } from "../../lib/password";
+import { hashPassword, verifyPassword } from "../../lib/password";
 import { generateRefreshToken, hashToken, generateAccessToken } from "../../util/tokens";
 import { createUserForEmail, findUserAuthByEmail } from "./auth.repository";
 import { UserCreatedResponse } from "./auth.types";
@@ -32,6 +32,8 @@ const createUserUsingEmailService = async (param: EmailAuthInput): Promise<UserC
     }
 
     const hashedRefreshToken = hashToken(refreshToken);
+
+    param.password = await hashPassword(param.password);
 
     const userId = await createUserForEmail(param, hashedRefreshToken);
     
