@@ -17,7 +17,7 @@ export const buildApp = (): FastifyInstance => {
     logger: {
       level: config.LOG_LEVEL,
       base: {
-        service: "url_shortener_backend",
+        service: config.SERVICE,
         env: config.NODE_ENV,
       },
     },

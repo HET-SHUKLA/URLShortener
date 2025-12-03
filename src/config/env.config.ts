@@ -48,6 +48,8 @@ const envSchema = z.object({
   COOKIE_SECRET: z.string({
     error: "COOKIE_SECRET required",
   }),
+  
+  SERVICE: z.string().default("url_shortener_backend"),
 });
 
 const parsed = envSchema.safeParse(process.env);
