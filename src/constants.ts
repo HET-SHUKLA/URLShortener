@@ -10,3 +10,5 @@ export const AUTH_USER_CREATING = "auth_user_creating"
 export const AUTH_USER_CREATED = "auth_user_created"
 export const AUTH_REGISTER_RATE_LIMITED = 
 "auth_register_rate_limited";
+
+export const FAILURE_APP_ERROR = "failure_app_error";

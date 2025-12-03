@@ -11,6 +11,7 @@ import healthRoutes from "./modules/health/health.routes";
 import userRoutes from "./modules/users/users.routes";
 import authRoutes from "./modules/auth/auth.routes";
 import cookie from "@fastify/cookie";
+import { FAILURE_APP_ERROR } from "./constants";
 
 export const buildApp = (): FastifyInstance => {
   const app = fastify({
@@ -56,29 +57,35 @@ export const buildApp = (): FastifyInstance => {
 
   // Global error handler
   app.setErrorHandler((error, req, reply) => {
-    logError("Something went wrong! -> ", error);
 
     if (error instanceof ZodError) {
       return badRequest(reply, "Invalid data", error.issues);
     }
 
     if (error instanceof AppError) {
+
+      logError(
+        reply,
+        FAILURE_APP_ERROR,
+        error.message,
+        {
+          statusCode: error.statusCode,
+          route: reply.request?.routeOptions.url,
+        }
+      )
+
       return reply.status(error.statusCode).send({
+        status: error.statusCode,
         success: false,
-        error: {
-          message: error.message,
-          details: error.details,
-        },
+        error: error.message,
       });
     }
 
     // Unknown errors
     return reply.status(500).send({
       success: false,
-      error: {
-        message: "Internal Server Error",
-        details: config.NODE_ENV === "development" ? (error as Error)?.message : "",
-      },
+      status: 500,
+      error: "Something went wrong, Try again after some time",
     });
   });
 
