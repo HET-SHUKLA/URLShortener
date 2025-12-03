@@ -1,68 +1,52 @@
-enum LogLevel {
-  Info = "INFO",
-  Error = "ERROR",
-  Success = "SUCCESS",
-  Failure = "FAILURE",
-  Debug = "DEBUG",
-}
+import type { FastifyReply } from "fastify";
+
+type LogMeta = Record<string, unknown>;
 
 /**
- * Helper function to log information
- * @param level Log level - [INFO, ERROR, SUCCESS, FAILURE, DEBUG]
- * @param msg Log message
- * @param data Option, Log data / error if any
+ * Helper function for logging info events
+ * @param reply FastifyReply object
+ * @param event Event that triggered this log
+ * @param message Log message
+ * @param meta Other information
  */
-const printLog = (level: LogLevel, msg: string, data?: unknown) => {
-  const timestamp = new Date().toISOString();
-  if (data !== undefined) {
-    console.log(`[${timestamp}] [${level}] ${msg}`, data);
-  } else {
-    console.log(`[${timestamp}] [${level}] ${msg}`);
-  }
+export const logInfo = (
+  reply: FastifyReply,
+  event: string,
+  message: string,
+  meta: LogMeta = {}
+) => {
+  reply.log.info({ event, ...meta }, message);
 };
 
 /**
- * Helper function to Log INFO events
- * @param msg Log message
- * @param data Log data
+ * Helper function for logging warning events
+ * @param reply FastifyReply object
+ * @param event Event that triggered this log
+ * @param message Log message
+ * @param meta Other information
  */
-export const logInfo = (msg: string, data?: unknown) => {
-  printLog(LogLevel.Info, msg, data);
+export const logWarn = (
+  reply: FastifyReply,
+  event: string,
+  message: string,
+  meta: LogMeta = {}
+) => {
+  reply.log.warn({ event, ...meta }, message);
 };
+
 
 /**
- * Helper function to Log ERROR events
- * @param msg Log message
- * @param data Log data
+ * Helper function for logging error events
+ * @param reply FastifyReply object
+ * @param event Event that triggered this log
+ * @param message Log message
+ * @param meta Other information
  */
-export const logError = (msg: string, data?: unknown) => {
-  printLog(LogLevel.Error, msg, data);
+export const logError = (
+  reply: FastifyReply,
+  event: string,
+  message: string,
+  meta: LogMeta = {}
+) => {
+  reply.log.error({ event, ...meta }, message);
 };
-
-/**
- * Helper function to Log SUCCESS events
- * @param msg Log message
- * @param data Log data
- */
-export const logSuccess = (msg: string, data?: unknown) => {
-  printLog(LogLevel.Success, msg, data);
-};
-
-/**
- * Helper function to Log FAILURE events
- * @param msg Log message
- * @param data Log data
- */
-export const logFailure = (msg: string, data?: unknown) => {
-  printLog(LogLevel.Failure, msg, data);
-};
-
-/**
- * Helper function to Log DEBUG events
- * @param msg Log message
- * @param data Log data
- */
-export const logDebug = (msg: string, data?: unknown) => {
-  console.debug(`[${new Date().toISOString()}] [${LogLevel.Debug}] ${msg}`, data ?? "");
-};
-
