@@ -1,4 +1,6 @@
 import { FastifyReply } from "fastify";
+import { logInfo, logWarn } from "./logger";
+import { HTTP_RESPONSE_BAD_REQUEST, HTTP_RESPONSE_SUCCESS } from "../constants";
 
 /**
  * Helper function to send OK response
@@ -7,6 +9,17 @@ import { FastifyReply } from "fastify";
  * @returns FastifyReply with status and data
  */
 export function ok<T>(reply: FastifyReply, message: string, data: T) {
+
+  logInfo(
+    reply,
+    HTTP_RESPONSE_SUCCESS,
+    message,
+    {
+      statusCode: 201,
+      route: reply.request?.routeOptions.url,
+    }
+  );
+
   return reply.status(200).send({
     status: 200,
     success: true,
@@ -22,6 +35,17 @@ export function ok<T>(reply: FastifyReply, message: string, data: T) {
  * @returns FastifyReply with status and data
  */
 export function created<T>(reply: FastifyReply, message: string, data: T) {
+
+  logInfo(
+    reply,
+    HTTP_RESPONSE_SUCCESS,
+    message, 
+    {
+      statusCode: 200,
+      route: reply.request?.routeOptions.url,
+    }
+  );
+
   return reply.status(201).send({
     status: 201,
     success: true,
@@ -34,17 +58,28 @@ export function created<T>(reply: FastifyReply, message: string, data: T) {
  * Helper function to send ERROR response
  * @param reply FastifyReply object
  * @param message Error message
- * @param details Optional, Error details
  * @returns FastifyReply with status and data
  */
 export function badRequest(
   reply: FastifyReply,
   error: string,
-  details?: unknown,
+  details?: {}
 ) {
+
+  logWarn(
+    reply,
+    HTTP_RESPONSE_BAD_REQUEST,
+    error,
+    {
+      statusCode: 400,
+      route: reply.request?.routeOptions.url,
+    }
+  )
+
   return reply.status(400).send({
     status: 400,
     success: false,
     error,
+    details
   });
 }

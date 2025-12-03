@@ -1,6 +1,9 @@
 import type { FastifyReply } from "fastify";
 
-type LogMeta = Record<string, unknown>;
+type LogMeta = {
+  statusCode?: number,
+  route?: string | undefined
+}
 
 /**
  * Helper function for logging info events
