@@ -4,6 +4,7 @@ import { createUserUsingEmailService } from "./auth.service";
 import { badRequest, created, ok } from "../../lib/response";
 import { InternalServerError } from "../../lib/error";
 import { getHeaderString } from "../../util/header";
+import { config } from "../../config/env.config";
 
 const handleMeAuth = () => {
 
@@ -33,7 +34,7 @@ const handleUserRegister = async (req: FastifyRequest, reply: FastifyReply) => {
     const refreshToken = res.refreshToken;
     reply.setCookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: true,
+        secure: config.NODE_ENV === "production" || config.NODE_ENV === "staging",
         sameSite: "lax",
         path: "/api/v1/auth",
         maxAge: 60 * 60 * 24 * 7 // 7 days

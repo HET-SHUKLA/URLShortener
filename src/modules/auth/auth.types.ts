@@ -12,7 +12,7 @@ interface UserAuthDTO {
     createdAt: Date,
     updatedAt: Date,
     lastSignInAt: Date,
-    meta: Object,
+    meta: Record<string, unknown>,
 }
 
 /**
