@@ -7,11 +7,11 @@ import { config } from "../../config/env.config";
 import { logInfo } from "../../lib/logger";
 import { AUTH_REGISTER_REQUEST, AUTH_USER_CREATED, AUTH_USER_CREATING } from "../../constants";
 
-const handleMeAuth = () => {
+export const handleMeAuth = () => {
 
 }
 
-const handleUserRegister = async (req: FastifyRequest, reply: FastifyReply) => {
+export const handleUserRegister = async (req: FastifyRequest, reply: FastifyReply) => {
     const clientRaw = req.headers['x-client-type'];
 
     logInfo(
@@ -71,32 +71,22 @@ const handleUserRegister = async (req: FastifyRequest, reply: FastifyReply) => {
 
 }
 
-const handleGoogleAuth = () => {
+export const handleGoogleAuth = () => {
 
 }
 
-const handleRefreshToken = () => {
+export const handleRefreshToken = () => {
 
 }
 
-const handleUserLogin = () => {
+export const handleUserLogin = () => {
 
 }
 
-const handleUserLogout = () => {
+export const handleUserLogout = () => {
 
 }
 
-const handleSessionLogout = () => {
+export const handleSessionLogout = () => {
 
-}
-
-export {
-    handleMeAuth,
-    handleUserRegister,
-    handleGoogleAuth,
-    handleRefreshToken,
-    handleUserLogin,
-    handleUserLogout,
-    handleSessionLogout
 }
