@@ -61,7 +61,7 @@ import { EmailAuthInput } from './auth.validators';
 //     });
 // };
 
-export const createUserForEmail = async (param: EmailAuthInput, hashedRefreshToken: string): Promise<string> => {
+export const createUserForEmail = async (param: EmailAuthInput, hashedRefreshToken: string, sessionParam: SessionParam): Promise<string> => {
 
     // Transaction to store user in User, UserAuth, Session
     try {
