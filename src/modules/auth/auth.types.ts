@@ -3,7 +3,7 @@ import { AuthProvider } from "../../generated/prisma/enums";
 /**
  * Auth DTO for Database
  */
-interface UserAuthDTO {
+export interface UserAuthDTO {
     id: string,
     userId: string,
     email: string,
@@ -18,13 +18,8 @@ interface UserAuthDTO {
 /**
  * User created response
  */
-interface UserCreatedResponse {
+export interface UserCreatedResponse {
     id: string,
     accessToken: string,
     refreshToken: string // Only when requested through mobile
-}
-
-export type {
-    UserAuthDTO,
-    UserCreatedResponse,
 }

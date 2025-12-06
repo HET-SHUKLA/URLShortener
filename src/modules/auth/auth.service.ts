@@ -5,7 +5,7 @@ import { createUserForEmail, findUserAuthByEmail } from "./auth.repository";
 import { UserCreatedResponse } from "./auth.types";
 import { EmailAuthInput } from "./auth.validators";
 
-const authenticateUserWithEmail = async (param: EmailAuthInput) => {
+export const authenticateUserWithEmail = async (param: EmailAuthInput) => {
     const record = await findUserAuthByEmail(param.email);
 
     if (!record || !record.password) {
@@ -24,7 +24,7 @@ const authenticateUserWithEmail = async (param: EmailAuthInput) => {
     };
 }
 
-const createUserUsingEmailService = async (param: EmailAuthInput): Promise<UserCreatedResponse> => {
+export const createUserUsingEmailService = async (param: EmailAuthInput): Promise<UserCreatedResponse> => {
     const refreshToken = generateRefreshToken();
 
     if (!refreshToken) {
@@ -54,9 +54,4 @@ const createUserUsingEmailService = async (param: EmailAuthInput): Promise<UserC
     };
 
     return response;
-}
-
-export {
-    authenticateUserWithEmail,
-    createUserUsingEmailService
 }
