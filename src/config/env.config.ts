@@ -41,7 +41,7 @@ const envSchema = z.object({
     error: "JWT_SECRET is required",
   }),
 
-  JWT_EXPIRES_IN: z.number({
+  JWT_EXPIRES_IN: z.coerce.number({
     error: "JWT_EXPIRES_IN required",
   }),
 
