@@ -20,6 +20,6 @@
     }
   },
 
-  "postCreateCommand": "sudo chown -R node:node /usr/src/app && npm ci"
+  "postCreateCommand": "npm ci"
 
 }
