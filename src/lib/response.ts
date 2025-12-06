@@ -11,11 +11,11 @@ import { HTTP_RESPONSE_BAD_REQUEST, HTTP_RESPONSE_SUCCESS } from "../constants";
 export function ok<T>(reply: FastifyReply, message: string, data: T) {
 
   logInfo(
-    reply,
+    reply.log,
     HTTP_RESPONSE_SUCCESS,
     message,
     {
-      statusCode: 201,
+      statusCode: 200,
       route: reply.request?.routeOptions.url,
     }
   );
@@ -37,11 +37,11 @@ export function ok<T>(reply: FastifyReply, message: string, data: T) {
 export function created<T>(reply: FastifyReply, message: string, data: T) {
 
   logInfo(
-    reply,
+    reply.log,
     HTTP_RESPONSE_SUCCESS,
     message, 
     {
-      statusCode: 200,
+      statusCode: 201,
       route: reply.request?.routeOptions.url,
     }
   );
@@ -67,7 +67,7 @@ export function badRequest(
 ) {
 
   logWarn(
-    reply,
+    reply.log,
     HTTP_RESPONSE_BAD_REQUEST,
     error,
     {

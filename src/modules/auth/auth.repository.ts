@@ -1,8 +1,9 @@
-import { REFRESH_TOKEN_EXPIRES_AT } from '../../constants';
+import { config } from '../../config/env.config';
 import { prisma } from '../../db/prisma';
 import { Prisma } from '../../generated/prisma/client';
 import { AuthProvider } from '../../generated/prisma/enums';
 import { ConflictError } from '../../lib/error';
+import { expiresInDays } from '../../util/time';
 import { UserAuthDTO } from './auth.types';
 import { EmailAuthInput, SessionInputSchema } from './auth.validators';
 
@@ -88,7 +89,7 @@ export const createUserForEmail = async (param: EmailAuthInput, sessionParam: Se
                 data: {
                     userId: user.id,
                     tokenHash: sessionParam.tokenHash,
-                    expiresAt: REFRESH_TOKEN_EXPIRES_AT,
+                    expiresAt: expiresInDays(config.REFRESH_TOKEN_TTL_DAYS),
                     userAgent: sessionParam.userAgent,
                     ip: sessionParam.ip
                 }

@@ -13,8 +13,6 @@ export const DAY = 24 * HOUR;             // 1 day in ms
 export const REFRESH_TOKEN_TTL_MS = daysToMs(config.REFRESH_TOKEN_TTL_DAYS);
 export const REFRESH_TOKEN_TTL_SECONDS = daysToSeconds(config.REFRESH_TOKEN_TTL_DAYS);
 
-export const REFRESH_TOKEN_EXPIRES_AT = expiresInDays(config.REFRESH_TOKEN_TTL_DAYS);
-
 
 // Logging Events
 export const HTTP_RESPONSE_SUCCESS = "http_response_success";

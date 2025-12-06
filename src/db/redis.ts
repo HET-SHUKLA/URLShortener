@@ -1,14 +1,9 @@
 import { createClient, RedisArgument } from "redis";
 import { config } from "../config/env.config";
-import { logDebug, logError } from "../lib/logger";
 import { AppError } from "../lib/error";
 
 export const redis = createClient({
   url: config.REDIS_URL,
-});
-
-redis.on("error", (err) => {
-  logError("While conecting redis! ", err);
 });
 
 /**

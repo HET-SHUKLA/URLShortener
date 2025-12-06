@@ -5,89 +5,88 @@ import { badRequest, created, ok } from "../../lib/response";
 import { getHeaderString } from "../../util/header";
 import { config } from "../../config/env.config";
 import { logInfo } from "../../lib/logger";
-import { AUTH_REGISTER_REQUEST, AUTH_USER_CREATED, AUTH_USER_CREATING, REFRESH_TOKEN_TTL_SECONDS } from "../../constants";
+import {
+  AUTH_REGISTER_REQUEST,
+  AUTH_USER_CREATED,
+  AUTH_USER_CREATING,
+  REFRESH_TOKEN_TTL_SECONDS,
+} from "../../constants";
 
-export const handleMeAuth = () => {
+export const handleMeAuth = () => {};
 
-}
+export const handleUserRegister = async (
+  req: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  const clientRaw = req.headers["x-client-type"];
+  const userAgent = req.headers["user-agent"] ?? null;
+  const ipAddress = req.ip;
 
-export const handleUserRegister = async (req: FastifyRequest, reply: FastifyReply) => {
-    const clientRaw = req.headers['x-client-type'];
-    const userAgent = req.headers['user-agent'] ?? null;
-    const ipAddress = req.ip;
-    
-    logInfo(
-        reply,
-        AUTH_REGISTER_REQUEST,
-        "User registration request receieved",
-        {
-            route: reply.request?.routeOptions.url
-        }
-    )
+  logInfo(
+    reply.log,
+    AUTH_REGISTER_REQUEST,
+    "User registration request receieved",
+    {
+      route: reply.request?.routeOptions.url,
+      userAgent,
+      ipAddress,
+    },
+  );
 
-    const body = emailAuthInputSchema.parse(req.body);
+  const clientType = getHeaderString(clientRaw)?.trim().toLowerCase();
 
-    const clientType = getHeaderString(clientRaw)?.trim().toLowerCase();
+  if (!clientType) {
+    return badRequest(reply, "X-Client-Type header is missing!");
+  }
 
-    if (!clientType) {
-        return badRequest(reply, "X-Client-Type header is missing!");
-    }
+  if (!["mobile", "web"].includes(clientType)) {
+    return badRequest(reply, "X-Client-Type header is invalid!");
+  }
 
-    if (!["mobile", "web"].includes(clientType)) {
-        return badRequest(reply, "X-Client-Type header is invalid!");
-    }
+  const body = emailAuthInputSchema.parse(req.body);
 
-    const isMobile = clientType === "mobile";
+  const isMobile = clientType === "mobile";
 
-    logInfo(
-        reply,
-        AUTH_USER_CREATING,
-        "User creation has been started",
-    )
+  logInfo(reply.log, AUTH_USER_CREATING, "User creation has been started");
 
-    const res = await createUserUsingEmailService(body, userAgent, ipAddress);
+  const res = await createUserUsingEmailService(body, userAgent, ipAddress);
 
-    if(isMobile) {
-        return created(reply, "User created successfully", res);
-    }
+  if (isMobile) {
+    return created(reply, "User created successfully", res);
+  }
 
-    const refreshToken = res.refreshToken;
-    reply.setCookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: config.NODE_ENV === "production" || config.NODE_ENV === "staging",
-        sameSite: "lax",
-        path: "/api/v1/auth",
-        maxAge: REFRESH_TOKEN_TTL_SECONDS
-    });
+  const refreshToken = res.refreshToken;
+  reply.setCookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: config.NODE_ENV === "production" || config.NODE_ENV === "staging",
+    sameSite: "lax",
+    path: "/api/v1/auth",
+    maxAge: REFRESH_TOKEN_TTL_SECONDS,
+  });
 
-    logInfo(
-        reply,
-        AUTH_USER_CREATED,
-        "User successfully created, Refresh token Cookie set",
-    )
+  logInfo(
+    reply.log,
+    AUTH_USER_CREATED,
+    "User successfully created, Refresh token Cookie set",
+    {
+      userId: res.id,
+      ip: ipAddress,
+      userAgent,
+    },
+  );
 
-    return created(reply, "User created successfully", {
-        "id": res.id,
-        "accessToken": res.accessToken,
-    });
-}
+  return created(reply, "User created successfully", {
+    id: res.id,
+    accessToken: res.accessToken,
+  });
+};
 
-export const handleGoogleAuth = () => {
+export const handleGoogleAuth = () => {};
 
-}
+export const handleRefreshToken = () => {};
 
-export const handleRefreshToken = () => {
+export const handleUserLogin = () => {};
 
-}
+export const handleUserLogout = () => {};
 
-export const handleUserLogin = () => {
-
-}
-
-export const handleUserLogout = () => {
-
-}
-
-export const handleSessionLogout = () => {
-
-}
+export const handleSessionLogout = () => {};

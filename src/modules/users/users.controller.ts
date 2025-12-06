@@ -13,7 +13,7 @@ const handleGetUser = async (req: FastifyRequest, reply: FastifyReply) => {
         throw new NotFoundError("User does not exists!");
     }
 
-    return ok(reply, user);
+    return ok(reply, "Health route", user);
 }
 
 const handleUserCreate = async (req: FastifyRequest, reply: FastifyReply) => {

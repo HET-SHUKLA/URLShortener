@@ -33,11 +33,11 @@ export const buildApp = (): FastifyInstance => {
   });
 
   // Health route
-  app.register(healthRoutes, { prefix: "/api/v1/health"});
+  app.register(healthRoutes, { prefix: "/api/v1/health" });
 
   // App routes
-  app.register(userRoutes, { prefix: "/api/v1/user"});
-  app.register(authRoutes, { prefix: "/api/v1/auth"});
+  app.register(userRoutes, { prefix: "/api/v1/user" });
+  app.register(authRoutes, { prefix: "/api/v1/auth" });
 
   // OnClose
   app.addHook("onClose", async () => {
@@ -59,22 +59,15 @@ export const buildApp = (): FastifyInstance => {
 
   // Global error handler
   app.setErrorHandler((error, req, reply) => {
-
     if (error instanceof ZodError) {
       return badRequest(reply, "Invalid data", error.issues);
     }
 
     if (error instanceof AppError) {
-
-      logError(
-        reply,
-        FAILURE_APP_ERROR,
-        error.message,
-        {
-          statusCode: error.statusCode,
-          route: reply.request?.routeOptions.url,
-        }
-      )
+      logError(reply.log, FAILURE_APP_ERROR, error.message, {
+        statusCode: error.statusCode,
+        route: reply.request?.routeOptions.url,
+      });
 
       return reply.status(error.statusCode).send({
         status: error.statusCode,
