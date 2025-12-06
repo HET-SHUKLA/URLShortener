@@ -45,6 +45,10 @@ const envSchema = z.object({
     error: "JWT_EXPIRES_IN required",
   }),
 
+  REFRESH_TOKEN_TTL_DAYS: z.coerce.number({
+    error: "REFRESH_TOKEN_TTL_DAYS required",
+  }),
+
   COOKIE_SECRET: z.string({
     error: "COOKIE_SECRET required",
   }),

@@ -9,7 +9,11 @@ dotenv.config({
 });
 
 // Overriding Database URL to use localhost. In .env.local, it is set to the docker container.
-const databaseUrl = process.env.DATABASE_URL_LOCALHOST ?? env("DATABASE_URL");  
+
+// When running local use this
+// const databaseUrl = process.env.DATABASE_URL_LOCALHOST ?? env("DATABASE_URL");  
+
+const databaseUrl = env("DATABASE_URL");  
 
 export default defineConfig({
   schema: "prisma/schema.prisma",

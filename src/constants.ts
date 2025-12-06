@@ -1,5 +1,16 @@
 // All the constant
 
+import { config } from "./config/env.config";
+
+// Token Expiry
+export const REFRESH_TOKEN_TTL_MS =
+  config.REFRESH_TOKEN_TTL_DAYS * 24 * 60 * 60 * 1000;
+
+export const REFRESH_TOKEN_TTL_SECONDS =  REFRESH_TOKEN_TTL_MS / 1000;
+
+
+export const REFRESH_TOKEN_EXPIRES_AT = new Date(Date.now() + REFRESH_TOKEN_TTL_MS);
+
 // Logging Events
 export const HTTP_RESPONSE_SUCCESS = "http_response_success";
 export const HTTP_RESPONSE_BAD_REQUEST = "http_response_bad_request";

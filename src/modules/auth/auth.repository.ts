@@ -1,3 +1,4 @@
+import { REFRESH_TOKEN_EXPIRES_AT } from '../../constants';
 import { prisma } from '../../db/prisma';
 import { Prisma } from '../../generated/prisma/client';
 import { AuthProvider } from '../../generated/prisma/enums';
@@ -52,15 +53,15 @@ import { EmailAuthInput } from './auth.validators';
 //     return auth;
 // };
 
-export const findUserAuthByEmail = async (email: string) => {
-    return await prisma.userAuth.findUnique({
-        where: {
-            email,
-        },
-    });
-};
+// export const findUserAuthByEmail = async (email: string) => {
+//     return await prisma.userAuth.findUnique({
+//         where: {
+//             email,
+//         },
+//     });
+// };
 
-export const createUserForEmail = async (param: EmailAuthInput, refreshToken: string) => {
+export const createUserForEmail = async (param: EmailAuthInput, hashedRefreshToken: string): Promise<string> => {
 
     // Transaction to store user in User, UserAuth, Session
     try {
@@ -80,7 +81,18 @@ export const createUserForEmail = async (param: EmailAuthInput, refreshToken: st
                     authProvider: AuthProvider.EMAIL,
                     password: param.password,
                 }
-            })
+            });
+
+            // Session
+            await tx.session.create({
+                data: {
+                    userId: user.id,
+                    tokenHash: hashedRefreshToken,
+                    expiresAt: REFRESH_TOKEN_EXPIRES_AT
+                }
+            });
+
+            return user.id;
         });
     } catch (e) {
         if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {

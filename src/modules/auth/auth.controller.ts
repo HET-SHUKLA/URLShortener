@@ -5,7 +5,7 @@ import { badRequest, created, ok } from "../../lib/response";
 import { getHeaderString } from "../../util/header";
 import { config } from "../../config/env.config";
 import { logInfo } from "../../lib/logger";
-import { AUTH_REGISTER_REQUEST, AUTH_USER_CREATED, AUTH_USER_CREATING } from "../../constants";
+import { AUTH_REGISTER_REQUEST, AUTH_USER_CREATED, AUTH_USER_CREATING, REFRESH_TOKEN_TTL_SECONDS } from "../../constants";
 
 export const handleMeAuth = () => {
 
@@ -55,7 +55,7 @@ export const handleUserRegister = async (req: FastifyRequest, reply: FastifyRepl
         secure: config.NODE_ENV === "production" || config.NODE_ENV === "staging",
         sameSite: "lax",
         path: "/api/v1/auth",
-        maxAge: 60 * 60 * 24 * 7 // 7 days
+        maxAge: REFRESH_TOKEN_TTL_SECONDS
     });
 
     logInfo(

@@ -1,28 +1,28 @@
 import { AuthError, InternalServerError } from "../../lib/error";
 import { hashPassword, verifyPassword } from "../../lib/password";
 import { generateRefreshToken, hashToken, generateAccessToken } from "../../util/tokens";
-import { createUserForEmail, findUserAuthByEmail } from "./auth.repository";
+import { createUserForEmail } from "./auth.repository";
 import { UserCreatedResponse } from "./auth.types";
 import { EmailAuthInput } from "./auth.validators";
 
-export const authenticateUserWithEmail = async (param: EmailAuthInput) => {
-    const record = await findUserAuthByEmail(param.email);
+// export const authenticateUserWithEmail = async (param: EmailAuthInput) => {
+//     const record = await findUserAuthByEmail(param.email);
 
-    if (!record || !record.password) {
-        throw new AuthError("Email or Password is invalid!");
-    }
+//     if (!record || !record.password) {
+//         throw new AuthError("Email or Password is invalid!");
+//     }
 
-    const isValid = verifyPassword(param.password, record.password);
+//     const isValid = verifyPassword(param.password, record.password);
 
-    if (!isValid) {
-        throw new AuthError("Email or Password is invalid!");
-    }
+//     if (!isValid) {
+//         throw new AuthError("Email or Password is invalid!");
+//     }
 
-    return {
-        userId: record.userId,
-        email: record.email,
-    };
-}
+//     return {
+//         userId: record.userId,
+//         email: record.email,
+//     };
+// }
 
 export const createUserUsingEmailService = async (param: EmailAuthInput): Promise<UserCreatedResponse> => {
     const refreshToken = generateRefreshToken();
