@@ -9,6 +9,7 @@
 ```
 // HEADER
 X-Client-Type: web
+user-agent: <optional>
 ```
 ```json
 {
@@ -22,7 +23,7 @@ X-Client-Type: web
 **201 Created**
 ```
 // ONLY FOR WEB
-HTTP/1.1 200 OK
+HTTP/1.1 201 Created
 Set-Cookie: refreshToken=<REFRESH_JWT>; HttpOnly; Secure; SameSite=Lax; Path=/api/v1/auth
 Content-Type: application/json
 ```
