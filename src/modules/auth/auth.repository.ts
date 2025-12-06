@@ -52,7 +52,7 @@ import { EmailAuthInput } from './auth.validators';
 //     return auth;
 // };
 
-const findUserAuthByEmail = async (email: string) => {
+export const findUserAuthByEmail = async (email: string) => {
     return await prisma.userAuth.findUnique({
         where: {
             email,
@@ -60,7 +60,7 @@ const findUserAuthByEmail = async (email: string) => {
     });
 };
 
-const createUserForEmail = async (param: EmailAuthInput, refreshToken: string) => {
+export const createUserForEmail = async (param: EmailAuthInput, refreshToken: string) => {
 
     // TODO: transaction to store user in User, UserAuth, Session
     try {
@@ -73,9 +73,4 @@ const createUserForEmail = async (param: EmailAuthInput, refreshToken: string) =
 
         throw e;
     }
-}
-
-export {
-    findUserAuthByEmail,
-    createUserForEmail
 }
