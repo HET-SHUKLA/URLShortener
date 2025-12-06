@@ -15,6 +15,8 @@ import { FAILURE_APP_ERROR } from "./constants";
 
 export const buildApp = (): FastifyInstance => {
   const app = fastify({
+    // For IP
+    trustProxy: true,
     logger: {
       level: config.LOG_LEVEL,
       base: {

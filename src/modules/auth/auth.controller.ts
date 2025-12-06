@@ -13,7 +13,9 @@ export const handleMeAuth = () => {
 
 export const handleUserRegister = async (req: FastifyRequest, reply: FastifyReply) => {
     const clientRaw = req.headers['x-client-type'];
-
+    const userAgent = req.headers['user-agent'] ?? null;
+    const ipAddress = req.ip;
+    
     logInfo(
         reply,
         AUTH_REGISTER_REQUEST,
@@ -43,7 +45,7 @@ export const handleUserRegister = async (req: FastifyRequest, reply: FastifyRepl
         "User creation has been started",
     )
 
-    const res = await createUserUsingEmailService(body);
+    const res = await createUserUsingEmailService(body, userAgent, ipAddress);
 
     if(isMobile) {
         return created(reply, "User created successfully", res);

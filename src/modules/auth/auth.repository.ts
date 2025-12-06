@@ -4,7 +4,7 @@ import { Prisma } from '../../generated/prisma/client';
 import { AuthProvider } from '../../generated/prisma/enums';
 import { ConflictError } from '../../lib/error';
 import { UserAuthDTO } from './auth.types';
-import { EmailAuthInput } from './auth.validators';
+import { EmailAuthInput, SessionInputSchema } from './auth.validators';
 
 // Not in v1.0.0
 // export const createAuthUser = async (params: {
@@ -61,7 +61,7 @@ import { EmailAuthInput } from './auth.validators';
 //     });
 // };
 
-export const createUserForEmail = async (param: EmailAuthInput, hashedRefreshToken: string, sessionParam: SessionParam): Promise<string> => {
+export const createUserForEmail = async (param: EmailAuthInput, sessionParam: SessionInputSchema): Promise<string> => {
 
     // Transaction to store user in User, UserAuth, Session
     try {
@@ -87,8 +87,10 @@ export const createUserForEmail = async (param: EmailAuthInput, hashedRefreshTok
             await tx.session.create({
                 data: {
                     userId: user.id,
-                    tokenHash: hashedRefreshToken,
-                    expiresAt: REFRESH_TOKEN_EXPIRES_AT
+                    tokenHash: sessionParam.tokenHash,
+                    expiresAt: REFRESH_TOKEN_EXPIRES_AT,
+                    userAgent: sessionParam.userAgent,
+                    ip: sessionParam.ip
                 }
             });
 

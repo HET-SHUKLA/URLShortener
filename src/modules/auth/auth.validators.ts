@@ -13,7 +13,14 @@ export const emailAuthInputSchema = z.object({
     password: z.string().min(8),
 });
 
+export const sessionInputSchema = z.object({
+    tokenHash: z.string(),
+    userAgent: z.string().nullable(),
+    ip: z.string().nullable(),
+});
 
 export type EmailAuthInput = z.infer<typeof emailAuthInputSchema>;
 
 export type Auth = z.infer<typeof authSchema>;
+
+export type SessionInputSchema = z.infer<typeof sessionInputSchema>;

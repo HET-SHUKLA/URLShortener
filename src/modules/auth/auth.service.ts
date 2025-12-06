@@ -3,7 +3,7 @@ import { hashPassword, verifyPassword } from "../../lib/password";
 import { generateRefreshToken, hashToken, generateAccessToken } from "../../util/tokens";
 import { createUserForEmail } from "./auth.repository";
 import { UserCreatedResponse } from "./auth.types";
-import { EmailAuthInput } from "./auth.validators";
+import { EmailAuthInput, SessionInputSchema } from "./auth.validators";
 
 // export const authenticateUserWithEmail = async (param: EmailAuthInput) => {
 //     const record = await findUserAuthByEmail(param.email);
@@ -24,18 +24,24 @@ import { EmailAuthInput } from "./auth.validators";
 //     };
 // }
 
-export const createUserUsingEmailService = async (param: EmailAuthInput): Promise<UserCreatedResponse> => {
+export const createUserUsingEmailService = async (param: EmailAuthInput, userAgent: string | null, ip: string | null): Promise<UserCreatedResponse> => {
     const refreshToken = generateRefreshToken();
 
     if (!refreshToken) {
         throw new InternalServerError();
     }
 
-    const hashedRefreshToken = hashToken(refreshToken);
+    const tokenHash = hashToken(refreshToken);
+
+    const sessionSchema: SessionInputSchema = {
+        tokenHash,
+        userAgent,
+        ip
+    }
 
     param.password = await hashPassword(param.password);
 
-    const userId = await createUserForEmail(param, hashedRefreshToken);
+    const userId = await createUserForEmail(param, sessionSchema);
     
     if (!userId) {
         throw new InternalServerError();
