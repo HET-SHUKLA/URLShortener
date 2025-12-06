@@ -68,7 +68,6 @@ export const handleUserRegister = async (req: FastifyRequest, reply: FastifyRepl
         "id": res.id,
         "accessToken": res.accessToken,
     });
-
 }
 
 export const handleGoogleAuth = () => {

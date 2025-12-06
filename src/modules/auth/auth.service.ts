@@ -53,5 +53,7 @@ export const createUserUsingEmailService = async (param: EmailAuthInput): Promis
         refreshToken,
     };
 
+    // TODO: Start a Job to send verification email link
+
     return response;
 }

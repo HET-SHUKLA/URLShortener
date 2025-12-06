@@ -62,10 +62,26 @@ export const findUserAuthByEmail = async (email: string) => {
 
 export const createUserForEmail = async (param: EmailAuthInput, refreshToken: string) => {
 
-    // TODO: transaction to store user in User, UserAuth, Session
+    // Transaction to store user in User, UserAuth, Session
     try {
-        const userId = "123";
-        return userId;
+        return await prisma.$transaction(async (tx) => {
+            // User
+            const user = await tx.user.create({
+                data: {
+                    email: param.email,
+                }
+            });
+
+            // UserAuth
+            await tx.userAuth.create({
+                data: {
+                    userId: user.id,
+                    email: param.email,
+                    authProvider: AuthProvider.EMAIL,
+                    password: param.password,
+                }
+            })
+        });
     } catch (e) {
         if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
             throw new ConflictError("User with email is already exists, Please login");
