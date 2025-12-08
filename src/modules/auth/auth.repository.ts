@@ -97,7 +97,7 @@ export const createUserForEmail = async (param: EmailAuthInput, sessionParam: Se
 
             return user.id;
         });
-    } catch (e) {
+    } catch (e: any) {
         if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
             throw new ConflictError("Email address is already exists, Kindly login");
         }

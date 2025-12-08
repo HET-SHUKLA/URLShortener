@@ -87,3 +87,18 @@ export class ConflictError extends AppError {
     super(error, 409, details);
   }
 }
+
+/**
+ * Too many requests error
+ */
+export class TooManyRequestsError extends AppError {
+
+  /**
+   * Create new TooManyRequestsError instance
+   * @param error Error message
+   * @param details Details of the error, If any
+   */
+  constructor(error = "Too Many requests", details?: unknown) {
+    super(error, 429, details);
+  }
+}

@@ -11,6 +11,7 @@ export const authSchema = z.object({
 export const emailAuthInputSchema = z.object({
     email: z.email(),
     password: z.string().min(8),
+    captcha: z.string().optional(),
 });
 
 export const sessionInputSchema = z.object({

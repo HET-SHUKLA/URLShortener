@@ -18,6 +18,7 @@ export const REFRESH_TOKEN_TTL_SECONDS = daysToSeconds(config.REFRESH_TOKEN_TTL_
 export const HTTP_RESPONSE_SUCCESS = "http_response_success";
 export const HTTP_RESPONSE_BAD_REQUEST = "http_response_bad_request";
 export const UNHANDLED_ERROR = "unhandled_error";
+export const TOO_MANY_REQUEST_ERROR = "too_many_requests";
 
 export const AUTH_REGISTER_REQUEST = "auth_register_request";
 export const AUTH_USER_CREATING = "auth_user_creating"
