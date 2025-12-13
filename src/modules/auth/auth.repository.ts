@@ -4,7 +4,6 @@ import { Prisma } from '../../generated/prisma/client';
 import { AuthProvider } from '../../generated/prisma/enums';
 import { ConflictError } from '../../lib/error';
 import { expiresInDays } from '../../util/time';
-import { UserAuthDTO } from './auth.types';
 import { EmailAuthInput, SessionInputSchema } from './auth.validators';
 
 // Not in v1.0.0
