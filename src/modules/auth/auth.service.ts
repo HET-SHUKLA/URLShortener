@@ -1,5 +1,5 @@
 import { AuthError, InternalServerError } from "../../lib/error";
-import { hashPassword, verifyPassword } from "../../lib/password";
+import { hashPassword } from "../../lib/password";
 import { generateRefreshToken, hashToken, generateAccessToken } from "../../util/tokens";
 import { createUserForEmail } from "./auth.repository";
 import { UserCreatedResponse } from "./auth.types";
