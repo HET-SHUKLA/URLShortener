@@ -7,7 +7,7 @@ import { randomBytes, createHash } from 'crypto';
  * @param userId User Id, sent in access token
  * @returns Signed access token
  */
-const generateAccessToken = (userId: string): string => {
+export const generateAccessToken = (userId: string): string => {
     return jwt.sign(
         {
             sub: userId,
@@ -24,7 +24,7 @@ const generateAccessToken = (userId: string): string => {
  * Helper function to create raw tokens
  * @returns Raw refresh token
  */
-const generateRefreshToken = (): string => {
+export const generateRefreshToken = (): string => {
     const buf = randomBytes(64);
     return buf.toString('base64')
         .replace(/\+/g, "-")
@@ -37,12 +37,6 @@ const generateRefreshToken = (): string => {
  * @param token Raw token
  * @returns Hashed token
  */
-const hashToken = (token: string): string => {
+export const hashToken = (token: string): string => {
   return createHash("sha256").update(token, "utf8").digest("hex");
-}
-
-export {
-    generateAccessToken,
-    generateRefreshToken,
-    hashToken
 }
