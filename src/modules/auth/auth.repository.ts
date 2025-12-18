@@ -61,7 +61,7 @@ import { EmailAuthInput, SessionInputSchema } from './auth.validators';
 //     });
 // };
 
-export const createUserForEmail = async (param: EmailAuthInput, sessionParam: SessionInputSchema): Promise<string> => {
+export const createUserWithEmail = async (param: EmailAuthInput, sessionParam: SessionInputSchema): Promise<string> => {
 
     // Transaction to store user in User, UserAuth, Session
     try {

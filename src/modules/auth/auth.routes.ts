@@ -8,8 +8,12 @@ import {
     handleUserLogout,
     handleSessionLogout
 } from "./auth.controller"
+import { authRateLimitHook } from "./auth.hook";
 
-const authRoutes = (fastify: FastifyInstance, opt: object) => {
+const authRoutes = async (fastify: FastifyInstance, opt: object) => {
+    // Hooks
+    await fastify.register(authRateLimitHook);
+
     // GET
     fastify.get("/me", handleMeAuth);
 

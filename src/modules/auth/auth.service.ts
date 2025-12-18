@@ -1,7 +1,7 @@
 import { AuthError, InternalServerError } from "../../lib/error";
 import { hashPassword } from "../../lib/password";
 import { generateRefreshToken, hashToken, generateAccessToken } from "../../util/tokens";
-import { createUserForEmail } from "./auth.repository";
+import { createUserWithEmail } from "./auth.repository";
 import { UserCreatedResponse } from "./auth.types";
 import { EmailAuthInput, SessionInputSchema } from "./auth.validators";
 
@@ -39,9 +39,10 @@ export const createUserUsingEmailService = async (param: EmailAuthInput, userAge
         ip
     }
 
+    // FIX: Instead of this, We might receive only hash password, since password is sensitive and we can not send that using req.body
     param.password = await hashPassword(param.password);
 
-    const userId = await createUserForEmail(param, sessionSchema);
+    const userId = await createUserWithEmail(param, sessionSchema);
     
     if (!userId) {
         throw new InternalServerError();

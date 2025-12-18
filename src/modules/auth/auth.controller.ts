@@ -4,17 +4,13 @@ import { createUserUsingEmailService } from "./auth.service";
 import { badRequest, created, ok } from "../../lib/response";
 import { getHeaderString } from "../../util/header";
 import { config } from "../../config/env.config";
-import { logInfo, logWarn } from "../../lib/logger";
+import { logInfo } from "../../lib/logger";
 import {
   AUTH_REGISTER_REQUEST,
   AUTH_USER_CREATED,
   AUTH_USER_CREATING,
   REFRESH_TOKEN_TTL_SECONDS,
-  TOO_MANY_REQUEST_ERROR,
 } from "../../constants";
-import { checkRateLimit } from "../../util/ratelimit";
-import { TooManyRequestsError } from "../../lib/error";
-import { checkRegisterRateLimit } from "./auth.rateLimit";
 
 export const handleMeAuth = () => {};
 
@@ -49,9 +45,6 @@ export const handleUserRegister = async (
 
   const body = emailAuthInputSchema.parse(req.body);
 
-  // Rate limit
-  await checkRegisterRateLimit(req.log, {ip: ipAddress});
-
   const isMobile = clientType === "mobile";
 
   logInfo(reply.log, AUTH_USER_CREATING, "User creation has been started");
@@ -59,6 +52,17 @@ export const handleUserRegister = async (
   const res = await createUserUsingEmailService(body, userAgent, ipAddress);
 
   if (isMobile) {
+    logInfo(
+      reply.log,
+      AUTH_USER_CREATED,
+      "User successfully created in mobile",
+      {
+        userId: res.id,
+        ip: ipAddress,
+        userAgent,
+      },
+    );
+
     return created(reply, "User created successfully", res);
   }
 
