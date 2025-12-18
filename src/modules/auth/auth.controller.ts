@@ -14,6 +14,12 @@ import {
 
 export const handleMeAuth = () => {};
 
+/**
+ * Handle user registration using Email and Password
+ * @param req FastifyRequest
+ * @param reply FastifyResponse
+ * @returns API response
+ */
 export const handleUserRegister = async (
   req: FastifyRequest,
   reply: FastifyReply,

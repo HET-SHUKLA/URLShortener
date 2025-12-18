@@ -10,7 +10,11 @@ import {
 } from "./auth.controller"
 import { authRateLimitHook } from "./auth.hook";
 
-const authRoutes = async (fastify: FastifyInstance, opt: object) => {
+/**
+ * Routes for '/api/v1/auth'
+ * @param fastify Fastify Instance
+ */
+const authRoutes = async (fastify: FastifyInstance) => {
     // Hooks
     await fastify.register(authRateLimitHook);
 

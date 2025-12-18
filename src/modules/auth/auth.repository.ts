@@ -61,6 +61,13 @@ import { EmailAuthInput, SessionInputSchema } from './auth.validators';
 //     });
 // };
 
+/**
+ * DB method to create user with email and password. Throws conflict error if Email is already exists
+ * @param param EmailAuthInput instance
+ * @param sessionParam SessionInputSchema instance
+ * @returns Id of created User
+ * 
+ */
 export const createUserWithEmail = async (param: EmailAuthInput, sessionParam: SessionInputSchema): Promise<string> => {
 
     // Transaction to store user in User, UserAuth, Session

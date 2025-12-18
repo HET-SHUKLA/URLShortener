@@ -15,6 +15,12 @@ export interface RateLimitResult {
     limit: number;
 }
 
+/**
+ * Helper function to check Rate limit for particular key
+ * @param key Unique Id e.g, IP address
+ * @param param1 RateLimitOptions object
+ * @returns RateLimitResult
+ */
 export const checkRateLimit = async (
     key: string, // unique id e.g, IP
     {limit, windowSeconds}: RateLimitOptions,
@@ -34,6 +40,13 @@ export const checkRateLimit = async (
     }
 }
 
+/**
+ * Helper function to check Rate limit of particular Ip address
+ * @param logger FastifyBaseLogger instance
+ * @param ip Ip address of Request
+ * @param action Requested action, e.g, "register", "login" etc.
+ * @param param3 RateLimitOptions object
+ */
 export const checkIpRateLimit = async (
     logger: FastifyBaseLogger,
     ip: string,

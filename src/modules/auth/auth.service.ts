@@ -24,6 +24,13 @@ import { EmailAuthInput, SessionInputSchema } from "./auth.validators";
 //     };
 // }
 
+/**
+ * Service function to create user with Email and Password
+ * @param param EmailAuthInput instance
+ * @param userAgent User agent from request object
+ * @param ip Ip address of request
+ * @returns Returns UserCreatedResponse
+ */
 export const createUserUsingEmailService = async (param: EmailAuthInput, userAgent: string | null, ip: string | null): Promise<UserCreatedResponse> => {
     const refreshToken = generateRefreshToken();
 
