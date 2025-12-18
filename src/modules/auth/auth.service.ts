@@ -46,7 +46,7 @@ export const createUserUsingEmailService = async (param: EmailAuthInput, userAge
         ip
     }
 
-    // FIX: Instead of this, We might receive only hash password, since password is sensitive and we can not send that using req.body
+    // From frontend, There should be hashed password since we are receiving password in the body. Hashing again just in case frontend is returning non hashed passwords
     param.password = await hashPassword(param.password);
 
     const userId = await createUserWithEmail(param, sessionSchema);
