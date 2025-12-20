@@ -8,7 +8,7 @@ import {
 
 const healthRoutes = (fastify: FastifyInstance, opts: object) => {
     // TODO: Protect health calls
-    //fastify.addHook("protection", verifyToken);
+    // fastify.addHook("protection", verifyToken);
 
     fastify.get("", handleHealthCheck);
     fastify.get("/prisma", handlePrismaHealthCheck);
