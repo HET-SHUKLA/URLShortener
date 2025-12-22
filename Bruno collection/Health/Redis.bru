@@ -1,0 +1,16 @@
+meta {
+  name: Redis
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{DOMAIN}}/{{API}}/{{VERSION}}/{{PATH}}/redis
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

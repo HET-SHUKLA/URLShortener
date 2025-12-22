@@ -1,0 +1,16 @@
+meta {
+  name: Register with Email
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{DOMAIN}}/{{API}}/{{VERSION}}/{{PATH}}/register
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

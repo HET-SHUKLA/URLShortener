@@ -31,7 +31,7 @@ const authRoutes = async (fastify: FastifyInstance) => {
     // fastify.post("/reset-password", handleResetPassword);
     // fastify.post("/reset-password?tokenId&token", handleNewPassword);
 
-    //DELETE
+    // DELETE
     fastify.delete("/logout", handleUserLogout);
     fastify.delete("/logout/:sessionId", handleSessionLogout);
 }
