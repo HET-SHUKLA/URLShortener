@@ -22,6 +22,8 @@ COPY . .
 
 # Expose API port
 EXPOSE 3000
+# Debugging port
+EXPOSE 9229
 
 # Run as non-root user for security
 USER node

@@ -29,6 +29,7 @@ services:
       - .env.local
     ports:
       - 3000:3000
+      - 9229:9229 # Debugging port
     volumes:
       - ./:/usr/src/app
       - node_modules:/usr/src/app/node_modules
