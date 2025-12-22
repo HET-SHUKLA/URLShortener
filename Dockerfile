@@ -28,4 +28,4 @@ EXPOSE 9229
 # Run as non-root user for security
 USER node
 
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "debug"]
