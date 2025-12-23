@@ -50,10 +50,9 @@ export const checkRateLimit = async (
 export const checkIpRateLimit = async (
     logger: FastifyBaseLogger,
     ip: string,
-    action: string, // e.g, "register", "login"
     {limit, windowSeconds}: RateLimitOptions,
 ) => {
-    const key = `rt:${action}:ip:${ip}`;
+    const key = `rt:ip:${ip}`;
     const rtResult = await checkRateLimit(key, {limit, windowSeconds});
 
     if (!rtResult.allowed) {

@@ -16,7 +16,7 @@ import { authRateLimitHook } from "./auth.hook";
  */
 const authRoutes = async (fastify: FastifyInstance) => {
     // Hooks
-    await fastify.register(authRateLimitHook);
+    fastify.addHook("onRequest", authRateLimitHook);
 
     // GET
     fastify.get("/me", handleMeAuth);
