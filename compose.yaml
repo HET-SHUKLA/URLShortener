@@ -37,6 +37,7 @@ services:
       - redis
       - postgres
       - alloy
+    command: sleep infinity
 
   # Loki
   loki:

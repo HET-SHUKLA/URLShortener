@@ -16,7 +16,7 @@
   "scripts": {
     "dev": "tsx src/server.ts",
     "dev:watch": "tsx watch src/server.ts",
-    "debug": "tsx --inspect src/server.ts",
+    "debug": "tsx --inspect=0.0.0.0:9229 src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
     "prettier": "prettier --write src/",

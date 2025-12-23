@@ -20,12 +20,11 @@ COPY . .
 # Set environment only for production builds
 #ENV NODE_ENV=development
 
-# Expose API port
-EXPOSE 3000
-# Debugging port
-EXPOSE 9229
+# Expose API port, Debugging port
+EXPOSE 3000 9229
 
 # Run as non-root user for security
 USER node
 
-CMD ["npm", "run", "debug"]
+# backend service intentionally omitted
+# CMD ["npm", "run", "debug"]
