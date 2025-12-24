@@ -60,7 +60,7 @@ export const buildApp = (): FastifyInstance => {
   // Global error handler
   app.setErrorHandler((error, req, reply) => {
     if (error instanceof ZodError) {
-      return badRequest(reply, "Invalid data", error.issues);
+      return badRequest(reply, "Invalid data");
     }
 
     if (error instanceof AppError) {

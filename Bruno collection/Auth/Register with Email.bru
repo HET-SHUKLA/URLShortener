@@ -6,8 +6,24 @@ meta {
 
 post {
   url: {{DOMAIN}}/{{API}}/{{VERSION}}/{{PATH}}/register
-  body: none
+  body: json
   auth: inherit
+}
+
+headers {
+  x-client-type: web
+}
+
+body:json {
+  {
+    "email": "abc@gmail.com",
+    "password": "12345678"
+  }
+}
+
+body:form-urlencoded {
+  ~email: abc@gmail.com
+  ~password: 1234
 }
 
 settings {
