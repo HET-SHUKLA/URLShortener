@@ -11,19 +11,15 @@ post {
 }
 
 headers {
-  x-client-type: web
+  x-client-type: mobile
+  ~x-client-type: web
 }
 
 body:json {
   {
-    "email": "abc@gmail.com",
+    "email": "abc1@gmail.com",
     "password": "12345678"
   }
-}
-
-body:form-urlencoded {
-  ~email: abc@gmail.com
-  ~password: 1234
 }
 
 settings {

@@ -76,6 +76,21 @@ export const buildApp = (): FastifyInstance => {
       });
     }
 
+    // Errors <500
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "statusCode" in error &&
+      typeof (error as any).statusCode === "number" &&
+      (error as any).statusCode < 500
+    ) {
+      return reply.status((error as any).statusCode).send({
+        success: false,
+        status: (error as any).statusCode,
+        error: (error as any).message ?? "Bad request",
+      });
+    }
+
     // Unknown errors
     return reply.status(500).send({
       success: false,
