@@ -4,12 +4,35 @@ meta {
   seq: 1
 }
 
-get {
+post {
   url: https://email.ap-south-1.amazonaws.com
-  body: none
-  auth: inherit
+  body: formUrlEncoded
+  auth: awsv4
+}
+
+headers {
+  Content-Type: application/x-www-form-urlencoded
+}
+
+auth:awsv4 {
+  accessKeyId: {{AWS_ACCESS_KEY}}
+  secretAccessKey: {{AWS_SECRET}}
+  sessionToken: 
+  service: ses
+  region: ap-south-1
+  profileName: 
+}
+
+body:form-urlencoded {
+  Action: SendEmail
+  Version: 2010-12-01
+  Source: no-reply@url.hetshukla.com
+  Destination.ToAddresses.member.1: shuklahet2704@gmail.com
+  Message.Subject.Data: SES Test
+  Message.Body.Text.Data: Hello from Bruno
 }
 
 settings {
   encodeUrl: true
+  timeout: 0
 }
