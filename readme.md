@@ -17,7 +17,6 @@ Implement CDN/edge caching for redirect responses. ✔️
 Harden security (rate limits, input validation, WAF rules). ✔️
 
 ---
-
 ## File Structure
 ```plaintext
 project-root/
