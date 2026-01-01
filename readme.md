@@ -285,7 +285,7 @@ That’s it. No Google, no refresh tokens yet. Get this rock solid first.
   * call service
   * map result → HTTP response
 * **No Prisma** calls.
-* **No raw business logic** (no hashing, no JWT, no DB decisions).
+* **No raw business logic** (no hashing, no JWT, no DB decisions)
 
 ### Service (`*.service.ts`)
 
