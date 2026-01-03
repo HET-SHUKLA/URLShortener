@@ -1,7 +1,7 @@
 // All the constant
 
 import { config } from "./config/env.config";
-import { daysToMs, daysToSeconds, expiresInDays } from "./util/time";
+import { daysToMs, daysToSeconds } from "./util/time";
 
 // Time constants
 export const SECOND = 1000;               // 1 second in ms
