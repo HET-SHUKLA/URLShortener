@@ -28,6 +28,7 @@
     "@fastify/helmet": "^13.0.2",
     "@prisma/adapter-pg": "^7.0.0",
     "@prisma/client": "^7.0.0",
+    "axios": "^1.13.2",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.66.4",
     "dotenv": "^17.2.3",
