@@ -9,5 +9,5 @@ const emailWorker = new Worker(EMAIL_SEND_QUEUE, async (job: Job) => {
         "Destination.ToAddresses.member.1": job.data.to,
         "Message.Subject.Data": job.data.subject,
         "Message.Body.Html.Data": job.data.body,
-    })
+    });
 })
