@@ -56,16 +56,20 @@ const envSchema = z.object({
   SERVICE: z.string().default("url_shortener_backend"),
 
   AWS_SECRET_ACCESS_KEY: z.string({
-    error: "AWS SES Secret key is required",
+    error: "AWS_SECRET_ACCESS_KEY is required",
   }),
 
   AWS_ACCESS_KEY_ID: z.string({
-    error: "AWS SES Access key is required",
+    error: "AWS_ACCESS_KEY_ID is required",
   }),
 
   AWS_SES_REGION: z.string({
-    error: "AWS SES region is required",
+    error: "AWS_SES_REGION is required",
   }),
+
+  SEND_EMAIL_FROM: z.string({
+    error: "SEND_EMAIL_FROM is required",
+  })
 });
 
 const parsed = envSchema.safeParse(process.env);
