@@ -6,7 +6,7 @@ export enum EmailTemplateEnum {
 export interface EmailTemplate {
     to: string,
     subject: string,
-    body: any
+    body: string,
 }
 
 /**
@@ -15,7 +15,7 @@ export interface EmailTemplate {
  * @param email Email address
  * @param data Optional data
  */
-export const createEmailBody = (template: EmailTemplateEnum, email: string, data?: any) => {
+export const createEmailTemplate = (template: EmailTemplateEnum, email: string, data?: any) => {
     let body: EmailTemplate;
     switch(template) {
         case EmailTemplateEnum.VerifyEmail :
@@ -25,7 +25,11 @@ export const createEmailBody = (template: EmailTemplateEnum, email: string, data
             body = createResetPasswordBody(email);
             break;
         default:
-            body = {to: email, subject: "Welcome to URL Shortener", body: "<h1>Welcome to URL Shortener</h1>"};
+            body = {
+                to: email, 
+                subject: "Welcome to URL Shortener", 
+                body: "<h1>Welcome to URL Shortener</h1>"
+            };
             break;
     }
 
