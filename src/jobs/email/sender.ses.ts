@@ -1,6 +1,6 @@
 import { SendEmailCommand, SESv2Client } from "@aws-sdk/client-sesv2";
-import { config } from "../config/env.config";
-import { EmailTemplate } from "../util/emailBody";
+import { config } from "../../config/env.config";
+import { EmailTemplate } from "./template";
 
 const ses = new SESv2Client({
     region: config.AWS_SES_REGION,

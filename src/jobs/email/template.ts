@@ -7,6 +7,7 @@ export interface EmailTemplate {
     to: string,
     subject: string,
     body: string,
+    idempotencyKey: string
 }
 
 /**
@@ -15,20 +16,21 @@ export interface EmailTemplate {
  * @param email Email address
  * @param data Optional data
  */
-export const createEmailTemplate = (template: EmailTemplateEnum, email: string, data?: any) => {
+export const createEmailTemplate = (template: EmailTemplateEnum, email: string, userId: string, data?: any) => {
     let body: EmailTemplate;
     switch(template) {
         case EmailTemplateEnum.VerifyEmail :
-            body = createVerifyEmailBody(email);
+            body = createVerifyEmailBody(email, userId);
             break;
         case EmailTemplateEnum.ResetPassowrd :
-            body = createResetPasswordBody(email);
+            body = createResetPasswordBody(email, userId);
             break;
         default:
             body = {
                 to: email, 
                 subject: "Welcome to URL Shortener", 
-                body: "<h1>Welcome to URL Shortener</h1>"
+                body: "<h1>Welcome to URL Shortener</h1>",
+                idempotencyKey: `default-key:${userId}`
             };
             break;
     }
@@ -41,13 +43,14 @@ export const createEmailTemplate = (template: EmailTemplateEnum, email: string, 
  * Helper function to create email body for email verification
  * @param email Email address
  */
-const createVerifyEmailBody = (email: string): EmailTemplate => {
+const createVerifyEmailBody = (email: string, userId: string): EmailTemplate => {
     const body = "<h1>Verify Email</h1></br><p>Click on below link to verify</p></br><a href='https://google.com'>Link</a>";
 
     const template: EmailTemplate = {
         to: email,
         subject: "URL Shortener - Email verification",
-        body
+        body,
+        idempotencyKey: `verify-email:${userId}`
     }
 
     return template;
@@ -57,13 +60,14 @@ const createVerifyEmailBody = (email: string): EmailTemplate => {
  * Helper function to create email body for password reset
  * @param email Email address
  */
-const createResetPasswordBody = (email: string): EmailTemplate => {
+const createResetPasswordBody = (email: string, userId: string): EmailTemplate => {
     const body = "<h1>Reset Password</h1></br><p>Click on below link to reset password</p></br><a href='https://google.com'>Link</a>";
 
     const template: EmailTemplate = {
         to: email,
         subject: "URL Shortener - Reset password",
-        body
+        body,
+        idempotencyKey: `reset-password:${userId}`
     }
 
     return template;

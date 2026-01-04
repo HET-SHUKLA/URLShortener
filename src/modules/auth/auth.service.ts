@@ -1,7 +1,7 @@
-import { createEmailSendingJob } from "../../jobs/producer";
-import { AuthError, InternalServerError } from "../../lib/error";
+import { createEmailSendingJob } from "../../jobs/email/queue.bullmq";
+import { InternalServerError } from "../../lib/error";
 import { hashPassword } from "../../lib/password";
-import { createEmailTemplate, EmailTemplateEnum } from "../../util/emailBody";
+import { createEmailTemplate, EmailTemplateEnum } from "../../jobs/email/template";
 import { generateRefreshToken, hashToken, generateAccessToken } from "../../util/tokens";
 import { createUserWithEmail } from "./auth.repository";
 import { UserCreatedResponse } from "./auth.types";
@@ -51,7 +51,7 @@ export const createUserUsingEmailService = async (param: EmailAuthInput, userAge
     param.password = await hashPassword(param.password);
 
     const userId = await createUserWithEmail(param, sessionSchema);
-    
+
     if (!userId) {
         throw new InternalServerError();
     }
@@ -69,7 +69,7 @@ export const createUserUsingEmailService = async (param: EmailAuthInput, userAge
     };
 
     // Job to send email
-    const template = createEmailTemplate(EmailTemplateEnum.VerifyEmail, param.email);
+    const template = createEmailTemplate(EmailTemplateEnum.VerifyEmail, param.email, userId);
     createEmailSendingJob(template);
 
     return response;
