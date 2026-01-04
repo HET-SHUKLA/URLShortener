@@ -55,11 +55,11 @@ const envSchema = z.object({
   
   SERVICE: z.string().default("url_shortener_backend"),
 
-  AWS_SES_SECRET_KEY: z.string({
+  AWS_SECRET_ACCESS_KEY: z.string({
     error: "AWS SES Secret key is required",
   }),
 
-  AWS_SES_ACCESS_KEY: z.string({
+  AWS_ACCESS_KEY_ID: z.string({
     error: "AWS SES Access key is required",
   }),
 
