@@ -1,0 +1,22 @@
+meta {
+  name: Verify User
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{DOMAIN}}/{{API}}/{{VERSION}}/{{PATH}}/verify
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "userId": "a13b3fbf-1840-4b09-a7b6-80143fac1f4e"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

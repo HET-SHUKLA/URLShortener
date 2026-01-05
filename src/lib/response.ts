@@ -8,7 +8,7 @@ import { HTTP_RESPONSE_BAD_REQUEST, HTTP_RESPONSE_SUCCESS } from "../constants";
  * @param data Response of a request
  * @returns FastifyReply with status and data
  */
-export function ok<T>(reply: FastifyReply, message: string, data: T) {
+export function ok<T>(reply: FastifyReply, message: string, data?: T) {
 
   logInfo(
     reply.log,
@@ -24,7 +24,7 @@ export function ok<T>(reply: FastifyReply, message: string, data: T) {
     status: 200,
     success: true,
     message,
-    data,
+    data: data ?? {},
   });
 }
 

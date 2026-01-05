@@ -11,7 +11,8 @@ import {
   AUTH_USER_CREATING,
   REFRESH_TOKEN_TTL_SECONDS,
 } from "../../constants";
-import { de } from "zod/v4/locales";
+import { createEmailTemplate, EmailTemplateEnum } from "../../jobs/email/template";
+import { createEmailSendingJob } from "../../jobs/email/queue.bullmq";
 
 export const handleMeAuth = () => {};
 
@@ -97,6 +98,17 @@ export const handleUserRegister = async (
     id: res.id,
     accessToken: res.accessToken,
   });
+};
+
+export const handleUserVerification = (
+  req: FastifyRequest,
+  reply: FastifyReply
+) => {
+  // TODO: Take input, What to verify (Email, Phone etc) and userId
+  const {userId} = req.body as any;
+  const template = createEmailTemplate(EmailTemplateEnum.VerifyEmail, "shuklahet2704@gmail.com", userId);
+  createEmailSendingJob(template);
+  return ok(reply, "Email is sent to your email address");
 };
 
 export const handleGoogleAuth = () => {};
