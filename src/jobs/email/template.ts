@@ -50,7 +50,7 @@ const createVerifyEmailBody = (email: string, userId: string): EmailTemplate => 
         to: email,
         subject: "URL Shortener - Email verification",
         body,
-        idempotencyKey: `verify-email:${userId}`
+        idempotencyKey: `verify-email-${userId}`
     }
 
     return template;
@@ -67,7 +67,7 @@ const createResetPasswordBody = (email: string, userId: string): EmailTemplate =
         to: email,
         subject: "URL Shortener - Reset password",
         body,
-        idempotencyKey: `reset-password:${userId}`
+        idempotencyKey: `reset-password-${userId}`
     }
 
     return template;
