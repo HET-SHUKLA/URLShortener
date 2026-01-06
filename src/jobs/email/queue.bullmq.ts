@@ -10,6 +10,10 @@ const connection = new IORedis({
 });
 const emailSendingQueue = new Queue(EMAIL_SEND_QUEUE, { connection });
 
+/**
+ * Helper function to create Email sending job and send it to the queue
+ * @param job EmailTemplate
+ */
 export const createEmailSendingJob = async (job: EmailTemplate) => {
     await emailSendingQueue.add(
         job.to,
