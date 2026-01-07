@@ -1,1 +1,1 @@
-import { emailSendingWorker } from "./worker.bullmq";
+import "./worker.bullmq";

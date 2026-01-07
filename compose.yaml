@@ -72,11 +72,12 @@ services:
       - loki
 
   # Email Worker
-  email_worker:
-    build: .
-    command: node src/jobs/email/worker.ts
-    depends_on:
-      - redis
+  # email_worker:
+  #   build: .
+  #   container_name: email_worker
+  #   command: npx tsx src/jobs/email/emailWorker.ts # Node >22
+  #   depends_on:
+  #     - redis
 
 volumes:
   pgdata:
