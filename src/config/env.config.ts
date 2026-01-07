@@ -33,6 +33,10 @@ const envSchema = z.object({
     error: "REDIS_URL is required",
   }),
 
+  REDIS_HOST: z.string({
+    error: "REDIS_HOST is required",
+  }),
+
   DATABASE_URL_LOCALHOST: z.string().optional(),
 
   LOG_LEVEL: z.string().default("info"),

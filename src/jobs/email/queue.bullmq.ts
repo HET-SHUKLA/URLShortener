@@ -2,9 +2,10 @@ import { Queue } from "bullmq";
 import { EMAIL_SEND_QUEUE } from "../../constants";
 import { EmailTemplate } from "./template";
 import IORedis from 'ioredis';
+import { config } from "../../config/env.config";
 
 const connection = new IORedis({
-    host: 'redis',
+    host: config.REDIS_HOST,
     maxRetriesPerRequest: null 
 });
 const emailSendingQueue = new Queue(EMAIL_SEND_QUEUE, { connection });
