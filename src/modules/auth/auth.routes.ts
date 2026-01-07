@@ -7,7 +7,8 @@ import {
     handleUserLogin,
     handleUserLogout,
     handleSessionLogout,
-    handleUserVerification
+    handleVerificationLinkSend,
+    handleEmailVerification
 } from "./auth.controller"
 import { authRateLimitHook } from "./auth.hook";
 
@@ -27,7 +28,8 @@ const authRoutes = async (fastify: FastifyInstance) => {
     fastify.post("/google", handleGoogleAuth);
     fastify.post("/refresh", handleRefreshToken);
     fastify.post("/login", handleUserLogin);
-    fastify.post("/verify", handleUserVerification)
+    fastify.post("/verify", handleVerificationLinkSend);
+    fastify.post("/verify-email/:id", handleEmailVerification);
 
     // In v1.1.0
     // fastify.post("/reset-password", handleResetPassword);

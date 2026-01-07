@@ -74,3 +74,8 @@ export const createUserUsingEmailService = async (param: EmailAuthInput, userAge
 
     return response;
 }
+
+export const verifyEmailAddressService = async (token: string): Promise<boolean> => {
+    // TODO: Repository call
+    return false;
+}

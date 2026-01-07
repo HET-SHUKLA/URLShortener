@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { emailAuthInputSchema } from "./auth.validators";
-import { createUserUsingEmailService } from "./auth.service";
+import { createUserUsingEmailService, verifyEmailAddressService } from "./auth.service";
 import { badRequest, created, ok } from "../../lib/response";
 import { getHeaderString } from "../../util/header";
 import { config } from "../../config/env.config";
@@ -13,6 +13,7 @@ import {
 } from "../../constants";
 import { createEmailTemplate, EmailTemplateEnum } from "../../jobs/email/template";
 import { createEmailSendingJob } from "../../jobs/email/queue.bullmq";
+import { AuthError } from "../../lib/error";
 
 export const handleMeAuth = () => {};
 
@@ -100,7 +101,7 @@ export const handleUserRegister = async (
   });
 };
 
-export const handleUserVerification = (
+export const handleVerificationLinkSend = (
   req: FastifyRequest,
   reply: FastifyReply
 ) => {
@@ -109,6 +110,19 @@ export const handleUserVerification = (
   const template = createEmailTemplate(EmailTemplateEnum.VerifyEmail, "shuklahet2704@gmail.com", userId);
   createEmailSendingJob(template);
   return ok(reply, "Email is sent to your email address");
+};
+
+export const handleEmailVerification = async (
+  req: FastifyRequest<{Querystring: {token: string}}>,
+  reply: FastifyReply
+) => {
+  // TODO: Add logs
+  const { token } = req.query;
+  const isVerified = await verifyEmailAddressService(token);
+  if (isVerified) {
+    return ok(reply, "Email address verified");
+  }
+  throw new AuthError("Token is either expired or does not exists");
 };
 
 export const handleGoogleAuth = () => {};
