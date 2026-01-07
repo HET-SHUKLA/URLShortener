@@ -4,7 +4,7 @@ import { EmailTemplate } from "./template";
 import IORedis from 'ioredis';
 import { config } from "../../config/env.config";
 
-const connection = new IORedis({
+export const connection = new IORedis({
     host: config.REDIS_HOST,
     maxRetriesPerRequest: null 
 });
