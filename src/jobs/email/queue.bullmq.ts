@@ -1,5 +1,5 @@
 import { Queue } from "bullmq";
-import { EMAIL_SEND_QUEUE } from "../../constants";
+import { EMAIL_SEND_JOB, EMAIL_SEND_QUEUE } from "../../constants";
 import { EmailTemplate } from "./template";
 import IORedis from 'ioredis';
 import { config } from "../../config/env.config";
@@ -16,11 +16,10 @@ const emailSendingQueue = new Queue(EMAIL_SEND_QUEUE, { connection });
  */
 export const createEmailSendingJob = async (job: EmailTemplate) => {
     await emailSendingQueue.add(
-        job.to,
+        EMAIL_SEND_JOB,
         job,
         {
             attempts: 3,
-            removeOnComplete: true,
             backoff: {
                 type: "exponential",
                 delay: 5000,

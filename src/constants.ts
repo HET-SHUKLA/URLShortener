@@ -30,3 +30,4 @@ export const FAILURE_APP_ERROR = "failure_app_error";
 
 // Job
 export const EMAIL_SEND_QUEUE = "email_send_queue";
+export const EMAIL_SEND_JOB = "email_send_job";
