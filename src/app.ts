@@ -12,6 +12,8 @@ import userRoutes from "./modules/users/users.routes";
 import authRoutes from "./modules/auth/auth.routes";
 import cookie from "@fastify/cookie";
 import { FAILURE_APP_ERROR } from "./constants";
+import swagger from '@fastify/swagger'
+import swaggerUI from '@fastify/swagger-ui'
 
 export const buildApp = (): FastifyInstance => {
   const app = fastify({
@@ -30,6 +32,31 @@ export const buildApp = (): FastifyInstance => {
   app.register(helmet);
   app.register(cookie, {
     secret: config.COOKIE_SECRET,
+  });
+
+  // Swagger
+  app.register(swagger, {
+    openapi: {
+      info: {
+        title: 'Your API Name',
+        description: 'Public API for Your Product',
+        version: '1.0.0'
+      },
+      servers: [
+        { url: 'https://api.yourcompany.com', description: 'Production' }
+      ],
+      tags: [
+        { name: 'Auth', description: 'Authentication & sessions' }
+      ]
+    }
+  });
+
+  app.register(swaggerUI, {
+    routePrefix: '/docs',
+    uiConfig: {
+      docExpansion: 'list',
+      deepLinking: true
+    }
   });
 
   // Health route
