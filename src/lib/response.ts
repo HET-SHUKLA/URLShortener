@@ -2,6 +2,13 @@ import { FastifyReply } from "fastify";
 import { logInfo, logWarn } from "./logger";
 import { HTTP_RESPONSE_BAD_REQUEST, HTTP_RESPONSE_SUCCESS } from "../constants";
 
+interface ResponseSchemaInterface {
+  status: number;
+  message: string;
+  success: boolean;
+  data?: object
+}
+
 /**
  * Helper function to send OK response
  * @param reply FastifyReply object
@@ -39,7 +46,7 @@ export function created<T>(reply: FastifyReply, message: string, data: T) {
   logInfo(
     reply.log,
     HTTP_RESPONSE_SUCCESS,
-    message, 
+    message,
     {
       statusCode: 201,
       route: reply.request?.routeOptions.url,
@@ -83,3 +90,32 @@ export function badRequest(
     details
   });
 }
+
+export const responseSchema = (description: string, object: ResponseSchemaInterface) => {
+  const baseSchema: any = {
+    description,
+    type: 'object',
+    properties: {
+      status: { type: 'number', example: object.status },
+      success: { type: 'boolean', example: object.success },
+    }
+  }
+
+  if (object.success) {
+    baseSchema.properties.message = {
+      type: 'string',
+      example: object.message
+    }
+
+    if (object.data) {
+      baseSchema.properties.data = object.data
+    }
+  } else {
+    baseSchema.properties.error = {
+      type: 'string',
+      example: object.message
+    }
+  }
+
+  return baseSchema;
+};
