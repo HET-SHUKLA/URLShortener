@@ -621,7 +621,7 @@ Authorization: Bearer <access_token>
 }
 ```
 
-#### 3. `GET /user/verify-email` (v1.1.0)
+#### 3. `GET /user/verify-email`
 > Send email to verify.
 
 **Request**
