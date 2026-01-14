@@ -14,6 +14,7 @@ import cookie from "@fastify/cookie";
 import { FAILURE_APP_ERROR } from "./constants";
 import swagger from '@fastify/swagger'
 import swaggerUI from '@fastify/swagger-ui'
+import urlRoutes from "./modules/urls/url.route";
 
 export const buildApp = (): FastifyInstance => {
   const app = fastify({
@@ -65,6 +66,7 @@ export const buildApp = (): FastifyInstance => {
   // App routes
   app.register(userRoutes, { prefix: "/api/v1/user" });
   app.register(authRoutes, { prefix: "/api/v1/auth" });
+  app.register(urlRoutes, { prefix: "/api/v1/url" });
 
   // OnClose
   app.addHook("onClose", async () => {
