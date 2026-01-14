@@ -1,6 +1,23 @@
 import { URL } from "../../constants";
 import { responseSchema, createBodySchema, internalServerErrorResponse } from "../../lib/response";
 
+const authHeaderOptional = {
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    authorization: { type: 'string', description: 'Bearer access token (Authorization: Bearer <access_token>)' }
+  }
+}
+
+const authHeaderRequired = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['authorization'],
+  properties: {
+    authorization: { type: 'string', description: 'Bearer access token (Authorization: Bearer <access_token>)' }
+  }
+}
+
 const postUrlBody = createBodySchema({
   description: "Create short URL",
   required: ['longUrl'],
@@ -113,6 +130,7 @@ export const postUrlSchema = {
   summary: "Create short URL",
   description: "Create short URL",
   body: postUrlBody,
+  headers: authHeaderOptional,
   response: postUrlResponse
 }
 
@@ -133,6 +151,7 @@ export const getUrlInfoSchema = {
   tags: [URL],
   summary: "Get URL information",
   description: "Get URL information (requires auth)",
+  headers: authHeaderRequired,
   response: getUrlInfoResponse
 }
 
@@ -143,6 +162,7 @@ export const getUrlStatsSchema = {
   tags: [URL],
   summary: "Get URL analytics",
   description: "Get URL analytics (paginated)",
+  headers: authHeaderRequired,
   response: getStatsResponse
 }
 
@@ -153,5 +173,6 @@ export const deleteUrlSchema = {
   tags: [URL],
   summary: "Delete URL",
   description: "Delete URL",
+  headers: authHeaderRequired,
   response: deleteUrlResponse
 }

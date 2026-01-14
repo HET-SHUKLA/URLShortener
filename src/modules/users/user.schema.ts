@@ -21,11 +21,11 @@ const userSuccessData = {
 
 const userMeHeader = {
   type: 'object',
-  required: ['Authorization'],
+  required: ['authorization'],
   properties: {
     authorization: {
       type: 'string',
-      description: 'Bearer refresh token (Authorization: Bearer <refresh_token>).'
+      description: 'Bearer access token (Authorization: Bearer <access_token>).'
     }
   }
 }
@@ -75,7 +75,7 @@ export const userMeSchema = {
   tags: [USER],
   summary: "Get user information",
   description: "Get user information from userId",
-  header: userMeHeader,
+  headers: userMeHeader,
   response: userMeResponse
 }
 
@@ -86,7 +86,7 @@ export const userSessionsSchema = {
   tags: [USER],
   summary: "Get user sessions",
   description: "Get user sessions",
-  header: userMeHeader,
+  headers: userMeHeader,
   response: userSessionsResponse
 }
 
@@ -97,6 +97,22 @@ export const deleteUserSchema = {
   tags: [USER],
   summary: "Delete user",
   description: "Delete user from database",
-    header: userMeHeader,
+    headers: userMeHeader,
   response: deleteUserResponse
+}
+
+/**
+ * GET /user/verify-email
+ */
+export const userVerifyEmailSchema = {
+  tags: [USER],
+  summary: "Send verification email",
+  description: "Send email to verify user email address",
+  headers: userMeHeader,
+  response: {
+    200: responseSchema({ status: 200, message: "Email sent successfully", success: true }),
+    400: responseSchema({ status: 400, message: "User ID is invalid", success: false }),
+    401: responseSchema({ status: 401, message: "Token is expired or invalid", success: false }),
+    ...internalServerErrorResponse
+  }
 }

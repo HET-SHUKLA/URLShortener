@@ -125,6 +125,18 @@ const refreshHeader = {
   }
 }
 
+const authHeader = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['authorization'],
+  properties: {
+    authorization: {
+      type: 'string',
+      description: 'Bearer access token (Authorization: Bearer <access_token>).'
+    }
+  }
+}
+
 const refreshSuccess = responseSchema({ status: 200, message: "Token refreshed", success: true, data: registerSuccessData })
 
 const refreshResponse = {
@@ -158,7 +170,7 @@ const loginResponse = {
   },
 
   400: responseSchema({ status: 400, message: "Provided data is invalid", success: false }),
-  401: responseSchema({ status: 400, message: "Email or Password is incorrect", success: false }),
+  401: responseSchema({ status: 401, message: "Email or Password is incorrect", success: false }),
   ...internalServerErrorResponse
 }
 
@@ -184,7 +196,7 @@ const meSuccessData = {
 const meResponse = {
   200: responseSchema({ status: 200, message: "User details fetched successfully", success: true, data: meSuccessData }),
   400: responseSchema({ status: 400, message: "Token is invalid", success: false }),
-  401: responseSchema({ status: 400, message: "Token is expired or invalid", success: false }),
+  401: responseSchema({ status: 401, message: "Token is expired or invalid", success: false }),
   ...internalServerErrorResponse
 }
 
@@ -202,7 +214,7 @@ const logoutHeader = {
 const logoutResponse = {
   200: responseSchema({ status: 200, message: "User logged out successfully", success: true }),
   400: responseSchema({ status: 400, message: "Token is invalid", success: false }),
-  401: responseSchema({ status: 400, message: "Token is expired or invalid", success: false }),
+  401: responseSchema({ status: 401, message: "Token is expired or invalid", success: false }),
   ...internalServerErrorResponse
 }
 
@@ -237,7 +249,7 @@ export const refreshSchema = {
   tags: [AUTH],
   summary: "Get new Access Token",
   description: "Get new Access Token when old one gets expired.",
-  header: refreshHeader,
+  headers: refreshHeader,
   response: refreshResponse
 }
 
@@ -259,6 +271,7 @@ export const meSchema = {
   tags: [AUTH],
   summary: "Retruns current user information",
   description: "Get current user information using JWT token",
+  headers: authHeader,
   response: meResponse
 }
 
@@ -269,8 +282,32 @@ export const logoutSchema = {
   tags: [AUTH],
   summary: "Login user with Email and Password",
   description: "Login user with Email and Password",
-  header: logoutHeader,
+  headers: authHeader,
   response: logoutResponse
 }
+
+/**
+ * DELETE auth/logout/:sessionId
+ */
+export const logoutSessionSchema = {
+  tags: [AUTH],
+  summary: "Logout user from specific session",
+  description: "Logout user from specific session",
+  headers: authHeader,
+  params: {
+    type: 'object',
+    required: ['sessionId'],
+    properties: {
+      sessionId: { type: 'string', description: 'Session ID to invalidate' }
+    }
+  },
+  response: {
+    200: responseSchema({ status: 200, message: "User logged out successfully from given session", success: true }),
+    400: responseSchema({ status: 400, message: "Session ID is invalid", success: false }),
+    401: responseSchema({ status: 401, message: "Token is expired or invalid", success: false }),
+    ...internalServerErrorResponse
+  }
+}
+
 
 
