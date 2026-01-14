@@ -11,7 +11,7 @@ import {
     handleEmailVerification
 } from "./auth.controller"
 import { authRateLimitHook } from "./auth.hook";
-import { googleSchema, registerSchema } from "./auth.schema";
+import { googleSchema, loginSchema, logoutSchema, logoutSessionSchema, refreshSchema, registerSchema } from "./auth.schema";
 
 /**
  * Routes for '/api/v1/auth'
@@ -33,8 +33,14 @@ const authRoutes = async (fastify: FastifyInstance) => {
         schema: googleSchema,
         handler: handleGoogleAuth
     });
-    fastify.post("/refresh", handleRefreshToken);
-    fastify.post("/login", handleUserLogin);
+    fastify.post("/refresh", {
+        schema: refreshSchema,
+        handler: handleRefreshToken
+    });
+    fastify.post("/login", {
+        schema: loginSchema,
+        handler: handleUserLogin
+    });
     fastify.post("/verify", handleVerificationLinkSend);
     fastify.post("/verify-email/:id", handleEmailVerification);
 
@@ -43,8 +49,14 @@ const authRoutes = async (fastify: FastifyInstance) => {
     // fastify.post("/reset-password?tokenId&token", handleNewPassword);
 
     // DELETE
-    fastify.delete("/logout", handleUserLogout);
-    fastify.delete("/logout/:sessionId", handleSessionLogout);
+    fastify.delete("/logout", {
+        schema: logoutSchema,
+        handler: handleUserLogout
+    });
+    fastify.delete("/logout/:sessionId", {
+        schema: logoutSessionSchema,
+        handler: handleSessionLogout
+    });
 }
 
 export default authRoutes;
