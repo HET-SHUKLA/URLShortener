@@ -3,7 +3,7 @@ import { deleteUrlSchema, getUrlInfoSchema, getUrlSchema, getUrlStatsSchema, pos
 
 const urlRoutes = (fastify: FastifyInstance, opt: object) => {
     // POST
-    fastify.post("/", {
+    fastify.post("", {
         schema: postUrlSchema,
         handler: () => {}
     });

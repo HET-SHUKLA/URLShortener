@@ -17,7 +17,7 @@ const userRoutes = (fastify: FastifyInstance, opt: object) => {
         handler: handleGetUser
     });
 
-    fastify.get("/me", {
+    fastify.get("/verify-email", {
         schema: userVerifyEmailSchema,
         handler: handleGetUser
     });
