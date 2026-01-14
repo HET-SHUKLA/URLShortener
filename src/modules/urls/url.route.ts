@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { getUrlSchema, postUrlSchema } from "./url.schema";
+import { deleteUrlSchema, getUrlInfoSchema, getUrlSchema, getUrlStatsSchema, postUrlSchema } from "./url.schema";
 
 const urlRoutes = (fastify: FastifyInstance, opt: object) => {
     // POST
@@ -8,8 +8,25 @@ const urlRoutes = (fastify: FastifyInstance, opt: object) => {
         handler: () => {}
     });
 
+    // GET
     fastify.get("/:id", {
         schema: getUrlSchema,
+        handler: () => {}
+    });
+
+    fastify.get("/get/:id", {
+        schema: getUrlInfoSchema,
+        handler: () => {}
+    });
+
+    fastify.get("/stats/:id", {
+        schema: getUrlStatsSchema,
+        handler: () => {}
+    });
+
+    // DELETE
+    fastify.delete("/:id", {
+        schema: deleteUrlSchema,
         handler: () => {}
     });
 }
