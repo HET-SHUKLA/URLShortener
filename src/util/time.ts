@@ -2,7 +2,7 @@
 // TTL Helpers
 // ===============================
 
-import { DAY } from "../constants";
+import { DAY, HOUR } from "../constants";
 
 /**
  * Convert days to milli seconds
@@ -10,6 +10,13 @@ import { DAY } from "../constants";
  * @returns Milliseconds in number
  */
 export const daysToMs = (days: number): number => days * DAY;
+
+/**
+ * Convert Hours to milli seconds
+ * @param hrs Number of Hours
+ * @returns Milliseconds in number
+ */
+export const hrsToMs = (hrs: number): number => hrs * HOUR;
 
 /**
  * Convert days to seconds
@@ -31,3 +38,25 @@ export const addMsToNow = (ms: number): Date => new Date(Date.now() + ms);
  * @returns Date
  */
 export const expiresInDays = (days: number): Date => addMsToNow(daysToMs(days));
+
+/**
+ * Expiration X hrs from now
+ * @param hrs Number of Hours
+ * @returns Date
+ */
+export const expiresInHrs = (hrs: number): Date => addMsToNow(hrsToMs(hrs));
+
+/**
+ * Checks whether a given date is expired compared to the current time.
+ *
+ * @param expiresAt - The expiration date (typically from Prisma)
+ * @param now - Optional override for current time (useful for testing)
+ * @returns true if the date is expired, false otherwise
+ */
+export function isDateExpired(
+    expiresAt: Date,
+    now: Date = new Date()
+): boolean {
+    return expiresAt.getTime() <= now.getTime()
+}
+

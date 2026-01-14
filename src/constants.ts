@@ -36,3 +36,10 @@ export const EMAIL_SEND_JOB = "email_send_job";
 export const AUTH = 'Auth';
 export const URL = 'URL';
 export const USER = 'User';
+
+// Verification URL
+export const VERIFICATION_URL = "http://localhost:3000/api/v1/auth/verify/";
+export const EMAIL = "email";
+
+// Utils
+export const FORWARD_SLACE = "/";

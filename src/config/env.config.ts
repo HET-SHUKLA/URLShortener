@@ -73,6 +73,10 @@ const envSchema = z.object({
 
   SEND_EMAIL_FROM: z.string({
     error: "SEND_EMAIL_FROM is required",
+  }),
+
+  VERIFICATION_TOKEN_TTL_HRS: z.coerce.number({
+    error: "VERIFICATION_TOKEN_TTL_HRS is required",
   })
 });
 

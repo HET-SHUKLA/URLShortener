@@ -8,7 +8,8 @@ import {
     handleUserLogout,
     handleSessionLogout,
     handleVerificationLinkSend,
-    handleEmailVerification
+    handleEmailVerification,
+    handleVerification
 } from "./auth.controller"
 import { authRateLimitHook } from "./auth.hook";
 import { googleSchema, loginSchema, logoutSchema, logoutSessionSchema, refreshSchema, registerSchema } from "./auth.schema";
@@ -24,10 +25,12 @@ const authRoutes = async (fastify: FastifyInstance) => {
     // GET
     fastify.get("/me", handleMeAuth);
 
+    fastify.get("/verify/:item/:token", handleVerification)
+
     //POST
     fastify.post("/register", { 
         schema: registerSchema,
-        handler: handleUserRegister 
+        handler: handleUserRegister
     });
     fastify.post("/google", {
         schema: googleSchema,
@@ -41,6 +44,8 @@ const authRoutes = async (fastify: FastifyInstance) => {
         schema: loginSchema,
         handler: handleUserLogin
     });
+
+    // Temporary for testing, It will be moved to Users
     fastify.post("/verify", handleVerificationLinkSend);
     fastify.post("/verify-email/:id", handleEmailVerification);
 

@@ -101,14 +101,18 @@ export const handleUserRegister = async (
   });
 };
 
-export const handleVerificationLinkSend = (
+export const handleVerificationLinkSend = async (
   req: FastifyRequest,
   reply: FastifyReply
 ) => {
   // TODO: Take input, What to verify (Email, Phone etc) and userId
   const {userId} = req.body as any;
-  const template = createEmailTemplate(EmailTemplateEnum.VerifyEmail, "shuklahet2704@gmail.com", userId);
-  createEmailSendingJob(template);
+  const template = createEmailTemplate(EmailTemplateEnum.VerifyEmail, "shuklahet2704@gmail.com", userId, "abc");
+  try {
+  await createEmailSendingJob(template);
+  } catch (e) {
+    console.log(e);
+  }
   return ok(reply, "Email is sent to your email address");
 };
 
@@ -124,6 +128,20 @@ export const handleEmailVerification = async (
   }
   throw new AuthError("Token is either expired or does not exists");
 };
+
+export const handleVerification = async (
+  req: FastifyRequest<{Params: {item: string, token: string}}>,
+  reply: FastifyReply
+) => {
+  // TODO: improve this function
+  const { item, token } = req.params;
+
+  const isVerified = await verifyEmailAddressService(token);
+  if (isVerified) {
+    return ok(reply, "Email address verified");
+  }
+  throw new AuthError("Token is either expired or does not exists");
+}
 
 export const handleGoogleAuth = () => {};
 

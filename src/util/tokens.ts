@@ -40,3 +40,7 @@ export const generateRefreshToken = (): string => {
 export const hashToken = (token: string): string => {
   return createHash("sha256").update(token, "utf8").digest("hex");
 }
+
+export const generateVerificationToken = (): string => {
+    return randomBytes(32).toString("hex");
+}

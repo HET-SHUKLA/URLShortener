@@ -1,9 +1,9 @@
 import { config } from '../../config/env.config';
 import { prisma } from '../../db/prisma';
 import { Prisma } from '../../generated/prisma/client';
-import { AuthProvider } from '../../generated/prisma/enums';
+import { AuthProvider, VerificationTokenType } from '../../generated/prisma/enums';
 import { ConflictError } from '../../lib/error';
-import { expiresInDays } from '../../util/time';
+import { expiresInDays, expiresInHrs, isDateExpired } from '../../util/time';
 import { EmailAuthInput, SessionInputSchema } from './auth.validators';
 
 // Not in v1.0.0
@@ -68,7 +68,7 @@ import { EmailAuthInput, SessionInputSchema } from './auth.validators';
  * @returns Id of created User
  * 
  */
-export const createUserWithEmail = async (param: EmailAuthInput, sessionParam: SessionInputSchema): Promise<string> => {
+export const createUserWithEmail = async (param: EmailAuthInput, sessionParam: SessionInputSchema, emailVerificationToken: string): Promise<string> => {
 
     // Transaction to store user in User, UserAuth, Session
     try {
@@ -101,6 +101,16 @@ export const createUserWithEmail = async (param: EmailAuthInput, sessionParam: S
                 }
             });
 
+            // VerificationToken
+            await tx.verificationToken.create({
+                data: {
+                    userId: user.id,
+                    tokenHash: emailVerificationToken,
+                    type: VerificationTokenType.EMAIL_VERIFY,
+                    expiresAt: expiresInHrs(config.VERIFICATION_TOKEN_TTL_HRS)
+                }
+            });
+
             return user.id;
         });
     } catch (e: any) {
@@ -108,6 +118,60 @@ export const createUserWithEmail = async (param: EmailAuthInput, sessionParam: S
             throw new ConflictError("Email address is already exists, Kindly login");
         }
 
+        throw e;
+    }
+}
+
+/**
+ * DB method to verify token. Returns either true or false.
+ * @param token Token to be verified
+ * @returns Boolean value
+ */
+export const verifyToken = async (token: string): Promise<boolean> => {
+    const currentDate = new Date();
+    const data = await prisma.verificationToken.findUnique({
+        where: {
+            tokenHash: token
+        }
+    });
+
+    if (!data || data?.usedAt) {
+        return false;
+    }
+
+    if (data?.expiresAt && isDateExpired(data?.expiresAt)) {
+        return false;
+    }
+
+    // Token is NOT expired
+    try {
+        await prisma.$transaction(async (tx) => {
+            // User
+            await tx.user.update({
+                where: {
+                    id: data.userId
+                },
+                data: {
+                    isEmailVerified: true,
+                    emailVerifiedAt: currentDate,
+                    updatedAt: currentDate
+                }
+            });
+
+            // VerificationToken
+            await tx.verificationToken.update({
+                where: {
+                    tokenHash: token
+                },
+                data: {
+                    expiresAt: currentDate,
+                    usedAt: currentDate
+                }
+            });
+        });
+
+        return true;
+    } catch (e: any) {
         throw e;
     }
 }

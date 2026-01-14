@@ -2,8 +2,8 @@ import { createEmailSendingJob } from "../../jobs/email/queue.bullmq";
 import { InternalServerError } from "../../lib/error";
 import { hashPassword } from "../../lib/password";
 import { createEmailTemplate, EmailTemplateEnum } from "../../jobs/email/template";
-import { generateRefreshToken, hashToken, generateAccessToken } from "../../util/tokens";
-import { createUserWithEmail } from "./auth.repository";
+import { generateRefreshToken, hashToken, generateAccessToken, generateVerificationToken } from "../../util/tokens";
+import { createUserWithEmail, verifyToken } from "./auth.repository";
 import { UserCreatedResponse } from "./auth.types";
 import { EmailAuthInput, SessionInputSchema } from "./auth.validators";
 
@@ -50,7 +50,9 @@ export const createUserUsingEmailService = async (param: EmailAuthInput, userAge
 
     param.password = await hashPassword(param.password);
 
-    const userId = await createUserWithEmail(param, sessionSchema);
+    const emailVerificationToken = generateVerificationToken();
+
+    const userId = await createUserWithEmail(param, sessionSchema, emailVerificationToken);
 
     if (!userId) {
         throw new InternalServerError();
@@ -69,13 +71,14 @@ export const createUserUsingEmailService = async (param: EmailAuthInput, userAge
     };
 
     // Job to send email
-    const template = createEmailTemplate(EmailTemplateEnum.VerifyEmail, param.email, userId);
+    const template = createEmailTemplate(EmailTemplateEnum.VerifyEmail, param.email, userId, emailVerificationToken);
+    // Temporary
+    template.to = "shuklahet2704@gmail.com";
     createEmailSendingJob(template);
 
     return response;
 }
 
 export const verifyEmailAddressService = async (token: string): Promise<boolean> => {
-    // TODO: Repository call
-    return false;
+    return await verifyToken(token);
 }
