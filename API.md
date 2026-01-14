@@ -719,7 +719,7 @@ Authorization: Bearer <access_token>
 ---
 
 ### PATCH
-#### 1. `PATCH /user/notification/:id` (v1.1.0)
+#### 1. `PATCH /user/notification/:id`
 > Make notification mark as read.
 
 **Request**

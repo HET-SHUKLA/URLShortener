@@ -34,3 +34,5 @@ export const EMAIL_SEND_JOB = "email_send_job";
 
 // Swagger tags
 export const AUTH = 'Auth';
+export const URL = 'URL';
+export const USER = 'User';

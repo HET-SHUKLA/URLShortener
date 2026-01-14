@@ -11,7 +11,7 @@ import {
     handleEmailVerification
 } from "./auth.controller"
 import { authRateLimitHook } from "./auth.hook";
-import { googleAuthSchema, registerSchema } from "./auth.schema";
+import { googleSchema, registerSchema } from "./auth.schema";
 
 /**
  * Routes for '/api/v1/auth'
@@ -30,7 +30,7 @@ const authRoutes = async (fastify: FastifyInstance) => {
         handler: handleUserRegister 
     });
     fastify.post("/google", {
-        schema: googleAuthSchema,
+        schema: googleSchema,
         handler: handleGoogleAuth
     });
     fastify.post("/refresh", handleRefreshToken);
