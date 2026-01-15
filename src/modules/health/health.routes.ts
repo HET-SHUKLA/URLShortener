@@ -7,7 +7,7 @@ import {
 } from "./health.controller"
 
 const healthRoutes = (fastify: FastifyInstance, opts: object) => {
-    // TODO: Protect health calls
+    // TODO: Protect health calls (Least priority)
     // fastify.addHook("protection", verifyToken);
 
     fastify.get("", handleHealthCheck);

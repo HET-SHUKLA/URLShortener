@@ -10,8 +10,10 @@ import {
   AUTH_USER_CREATED,
   AUTH_USER_CREATING,
   EMAIL,
+  MOBILE,
   PASSWORD,
   REFRESH_TOKEN_TTL_SECONDS,
+  WEB,
 } from "../../constants";
 import { AuthError, NotFoundError } from "../../lib/error";
 
@@ -48,7 +50,7 @@ export const handleUserRegister = async (
     return badRequest(reply, "X-Client-Type header is missing!");
   }
 
-  if (!["mobile", "web"].includes(clientType)) {
+  if (![MOBILE, WEB].includes(clientType)) {
     return badRequest(reply, "X-Client-Type header is invalid!");
   }
 
