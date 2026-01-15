@@ -41,13 +41,12 @@ export const createEmailTemplate = (template: EmailTemplateEnum, email: string, 
     return body;
 }
 
-// TODO: Generate links
 /**
  * Helper function to create email body for email verification
  * @param email Email address
  */
 const createVerifyEmailBody = (email: string, userId: string, token: string): EmailTemplate => {
-    const fullUrl = VERIFICATION_URL + EMAIL + FORWARD_SLACE + token; 
+    const fullUrl = VERIFICATION_URL + EMAIL + FORWARD_SLACE + token;
     const body = `<h1>Verify Email Address</h1></br><h2>Click on below link to verify</h2></br><h2><a href='${fullUrl}'>Click to Verify Email Address</a></h2>`;
 
     const template: EmailTemplate = {

@@ -40,6 +40,7 @@ export const USER = 'User';
 // Verification URL
 export const VERIFICATION_URL = "http://localhost:3000/api/v1/auth/verify/";
 export const EMAIL = "email";
+export const PASSWORD = "password";
 
 // Utils
 export const FORWARD_SLACE = "/";

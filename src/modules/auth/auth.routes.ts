@@ -7,8 +7,6 @@ import {
     handleUserLogin,
     handleUserLogout,
     handleSessionLogout,
-    handleVerificationLinkSend,
-    handleEmailVerification,
     handleVerification
 } from "./auth.controller"
 import { authRateLimitHook } from "./auth.hook";
@@ -24,7 +22,6 @@ const authRoutes = async (fastify: FastifyInstance) => {
 
     // GET
     fastify.get("/me", handleMeAuth);
-
     fastify.get("/verify/:item/:token", handleVerification)
 
     //POST
@@ -44,10 +41,6 @@ const authRoutes = async (fastify: FastifyInstance) => {
         schema: loginSchema,
         handler: handleUserLogin
     });
-
-    // Temporary for testing, It will be moved to Users
-    fastify.post("/verify", handleVerificationLinkSend);
-    fastify.post("/verify-email/:id", handleEmailVerification);
 
     // In v1.1.0
     // fastify.post("/reset-password", handleResetPassword);
