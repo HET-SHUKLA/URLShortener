@@ -1,6 +1,19 @@
 import type { FastifyBaseLogger } from "fastify";
+import pino from 'pino';
+import { config } from "../config/env.config";
 
 type LogMeta = Record<string, unknown>
+
+/**
+ * Base logger to log outside HTTP request
+ */
+export const baseLogger = pino({
+  level: config.LOG_LEVEL,
+  base: {
+    service: config.SERVICE,
+    env: config.NODE_ENV,
+  },
+});
 
 /**
  * Helper function for logging info events
