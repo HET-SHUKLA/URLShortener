@@ -4,6 +4,7 @@ import { Prisma } from '../../generated/prisma/client';
 import { AuthProvider, VerificationTokenType } from '../../generated/prisma/enums';
 import { ConflictError } from '../../lib/error';
 import { expiresInDays, expiresInHrs, isDateExpired } from '../../util/time';
+import { UserDTO } from './auth.types';
 import { EmailAuthInput, SessionInputSchema } from './auth.validators';
 
 // Not in v1.0.0
@@ -144,34 +145,38 @@ export const verifyToken = async (token: string): Promise<boolean> => {
     }
 
     // Token is NOT expired
-    try {
-        await prisma.$transaction(async (tx) => {
-            // User
-            await tx.user.update({
-                where: {
-                    id: data.userId
-                },
-                data: {
-                    isEmailVerified: true,
-                    emailVerifiedAt: currentDate,
-                    updatedAt: currentDate
-                }
-            });
-
-            // VerificationToken
-            await tx.verificationToken.update({
-                where: {
-                    tokenHash: token
-                },
-                data: {
-                    expiresAt: currentDate,
-                    usedAt: currentDate
-                }
-            });
+    await prisma.$transaction(async (tx) => {
+        // User
+        await tx.user.update({
+            where: {
+                id: data.userId
+            },
+            data: {
+                isEmailVerified: true,
+                emailVerifiedAt: currentDate,
+                updatedAt: currentDate
+            }
         });
 
-        return true;
-    } catch (e: any) {
-        throw e;
-    }
+        // VerificationToken
+        await tx.verificationToken.update({
+            where: {
+                tokenHash: token
+            },
+            data: {
+                expiresAt: currentDate,
+                usedAt: currentDate
+            }
+        });
+    });
+
+    return true;
+}
+
+export const getUserFromUserId = async (userId: string): Promise<UserDTO | null> => {
+    return await prisma.user.findUnique({
+        where: {
+            id: userId,
+        }
+    });
 }

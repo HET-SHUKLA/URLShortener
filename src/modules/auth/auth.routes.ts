@@ -10,7 +10,7 @@ import {
     handleVerification
 } from "./auth.controller"
 import { authRateLimitHook } from "./auth.hook";
-import { googleSchema, loginSchema, logoutSchema, logoutSessionSchema, refreshSchema, registerSchema } from "./auth.schema";
+import { googleSchema, loginSchema, logoutSchema, logoutSessionSchema, meSchema, refreshSchema, registerSchema } from "./auth.schema";
 
 /**
  * Routes for '/api/v1/auth'
@@ -21,7 +21,10 @@ const authRoutes = async (fastify: FastifyInstance) => {
     fastify.addHook("onRequest", authRateLimitHook);
 
     // GET
-    fastify.get("/me", handleMeAuth);
+    fastify.get("/me", {
+        schema: meSchema,
+        handler: handleMeAuth
+    });
     fastify.get("/verify/:item/:token", handleVerification)
 
     //POST

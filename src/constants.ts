@@ -47,3 +47,4 @@ export const PASSWORD = "password";
 
 // Utils
 export const FORWARD_SLACE = "/";
+export const EMPTY_STRING = "";

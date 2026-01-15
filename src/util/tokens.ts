@@ -1,6 +1,22 @@
 import jwt from 'jsonwebtoken';
 import { config } from '../config/env.config';
 import { randomBytes, createHash } from 'crypto';
+import { EMPTY_STRING } from '../constants';
+
+/**
+ * Helper function to fetched user id from JWT access token
+ * @param token Hashed JWT access token
+ * @returns User Id
+ */
+export const getUserIdFromAccessToken = (token: string): string | null => {
+    try {
+        const payload = jwt.verify(token, config.JWT_SECRET) as jwt.JwtPayload;
+
+        return payload.sub ?? null;
+    } catch (e) {
+        return null;
+    }
+};
 
 /**
  * Helper function to create access token

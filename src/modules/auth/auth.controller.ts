@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { emailAuthInputSchema } from "./auth.validators";
-import { createUserUsingEmailService, verifyEmailAddressService } from "./auth.service";
+import { createUserUsingEmailService, getUserFromAccessTokenService, verifyEmailAddressService } from "./auth.service";
 import { badRequest, created, ok } from "../../lib/response";
 import { getHeaderString } from "../../util/header";
 import { config } from "../../config/env.config";
@@ -17,7 +17,35 @@ import {
 } from "../../constants";
 import { AuthError, NotFoundError } from "../../lib/error";
 
-export const handleMeAuth = () => {};
+/**
+ * Returns User's information based on access token
+ * @param req FastifyRequest
+ * @param reply FastifyResponse
+ * @returns API response
+ */
+export const handleMeAuth = async (
+  req: FastifyRequest,
+  reply: FastifyReply
+) => {
+  const authorization = req.headers["authorization"];
+
+  // Remove "Bearer"
+  const token = authorization?.split(" ")[1];
+
+  if (!token) {
+    return badRequest(reply, "Token is invalid");
+  }
+
+  const userData = await getUserFromAccessTokenService(token);
+
+  const responseData = {
+    id: userData.id,
+    email: userData.email,
+    isEmailVerified: userData.isEmailVerified
+  }
+
+  return ok(reply, "User details fetched successfully", responseData);
+};
 
 /**
  * Handle user registration using Email and Password

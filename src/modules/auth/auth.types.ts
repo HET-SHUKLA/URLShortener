@@ -1,6 +1,19 @@
 import { AuthProvider } from "../../generated/prisma/enums";
 
 /**
+ * User DTO
+ */
+export interface UserDTO {
+    id: string;
+    email: string;
+    isEmailVerified: boolean;
+    emailVerifiedAt: Date | null;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date | null;
+}
+
+/**
  * Auth DTO for Database
  */
 export interface UserAuthDTO {

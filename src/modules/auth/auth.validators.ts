@@ -1,6 +1,12 @@
 import { z } from "zod";
 import { AuthProvider } from "../../generated/prisma/enums";
 
+export interface meUserData {
+    id: string;
+    email: string;
+    isEmailVerified: boolean;
+}
+
 export const authSchema = z.object({
     email: z.email(),
     authProvider: z.enum(AuthProvider),

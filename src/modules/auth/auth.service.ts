@@ -1,11 +1,12 @@
 import { createEmailSendingJob } from "../../jobs/email/queue.bullmq";
-import { InternalServerError } from "../../lib/error";
+import { AuthError, InternalServerError, NotFoundError } from "../../lib/error";
 import { hashPassword } from "../../lib/password";
 import { createEmailTemplate, EmailTemplateEnum } from "../../jobs/email/template";
-import { generateRefreshToken, hashToken, generateAccessToken, generateVerificationToken } from "../../util/tokens";
-import { createUserWithEmail, verifyToken } from "./auth.repository";
-import { UserCreatedResponse } from "./auth.types";
+import { generateRefreshToken, hashToken, generateAccessToken, generateVerificationToken, getUserIdFromAccessToken } from "../../util/tokens";
+import { createUserWithEmail, getUserFromUserId, verifyToken } from "./auth.repository";
+import { UserCreatedResponse, UserDTO } from "./auth.types";
 import { EmailAuthInput, SessionInputSchema } from "./auth.validators";
+import { EMPTY_STRING } from "../../constants";
 
 // export const authenticateUserWithEmail = async (param: EmailAuthInput) => {
 //     const record = await findUserAuthByEmail(param.email);
@@ -77,6 +78,22 @@ export const createUserUsingEmailService = async (param: EmailAuthInput, userAge
     createEmailSendingJob(template);
 
     return response;
+}
+
+export const getUserFromAccessTokenService = async (token: string): Promise<UserDTO> => {
+    const userId = getUserIdFromAccessToken(token);
+
+    if (!userId) {
+        throw new AuthError("Token is expired or invalid");
+    }
+
+    const data = await getUserFromUserId(userId);
+
+    if (!data) {
+        throw new NotFoundError("User does not exists!");
+    }
+
+    return data;
 }
 
 export const verifyEmailAddressService = async (token: string): Promise<boolean> => {
