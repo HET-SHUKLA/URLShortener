@@ -173,6 +173,11 @@ export const verifyToken = async (token: string): Promise<boolean> => {
     return true;
 }
 
+/**
+ * DB method to get User data from User ID
+ * @param userId User ID
+ * @returns Either UserDTO object or Null If user id does not exists
+ */
 export const getUserFromUserId = async (userId: string): Promise<UserDTO | null> => {
     return await prisma.user.findUnique({
         where: {

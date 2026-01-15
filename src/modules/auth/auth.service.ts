@@ -80,6 +80,11 @@ export const createUserUsingEmailService = async (param: EmailAuthInput, userAge
     return response;
 }
 
+/**
+ * Service to fetch User's data based on Access token
+ * @param token Access token
+ * @returns UserDTO object
+ */
 export const getUserFromAccessTokenService = async (token: string): Promise<UserDTO> => {
     const userId = getUserIdFromAccessToken(token);
 
@@ -96,6 +101,11 @@ export const getUserFromAccessTokenService = async (token: string): Promise<User
     return data;
 }
 
+/**
+ * Service to verify email address based on Verification token
+ * @param token Verification token
+ * @returns boolean
+ */
 export const verifyEmailAddressService = async (token: string): Promise<boolean> => {
     return await verifyToken(token);
 }
