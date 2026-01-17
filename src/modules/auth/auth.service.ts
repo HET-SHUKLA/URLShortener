@@ -1,9 +1,9 @@
 import { createEmailSendingJob } from "../../jobs/email/queue.bullmq";
 import { AuthError, InternalServerError, NotFoundError } from "../../lib/error";
-import { hashPassword } from "../../lib/password";
+import { hashPassword, verifyPassword } from "../../lib/password";
 import { createEmailTemplate, EmailTemplateEnum } from "../../jobs/email/template";
 import { generateRefreshToken, hashToken, generateAccessToken, generateVerificationToken, getUserIdFromAccessToken } from "../../util/tokens";
-import { createUserWithEmail, getUserFromUserId, verifyToken } from "./auth.repository";
+import { createUserWithEmail, getUserFromEmail, getUserFromUserId, storeDataInSession, verifyToken } from "./auth.repository";
 import { UserCreatedResponse, UserDTO } from "./auth.types";
 import { EmailAuthInput, SessionInputSchema } from "./auth.validators";
 import { EMPTY_STRING } from "../../constants";
@@ -82,15 +82,17 @@ export const createUserUsingEmailService = async (param: EmailAuthInput, userAge
 
 export const loginUserUsingEmailPassword = async (param: EmailAuthInput, userAgent: string | null, ip: string | null): Promise<UserCreatedResponse> => {
     // DB call to fetch user data based on email address
-    const data = {userId: ""};
+    const data = await getUserFromEmail(param.email);
 
-    if (!data) {
+    if (!data || !data.password) {
         throw new AuthError("Email or Password is incorrect");
     }
 
-    // TODO: compare password
-    // If password is correct, Send DB call and store session data
-    // Return
+    const isPasswordCorrect = await verifyPassword(param.password, data.password);
+
+    if (!isPasswordCorrect) {
+        throw new AuthError("Email or Password is incorrect");
+    }
 
     const refreshToken = generateRefreshToken();
 
@@ -112,8 +114,10 @@ export const loginUserUsingEmailPassword = async (param: EmailAuthInput, userAge
         throw new InternalServerError();
     }
 
+    const userId = await storeDataInSession(param, sessionSchema, data.userId);
+
     const response: UserCreatedResponse = {
-        id: data.userId,
+        id: userId,
         accessToken,
         refreshToken,
     };

@@ -1,10 +1,11 @@
+import { email } from 'zod';
 import { config } from '../../config/env.config';
 import { prisma } from '../../db/prisma';
 import { Prisma } from '../../generated/prisma/client';
 import { AuthProvider, VerificationTokenType } from '../../generated/prisma/enums';
 import { ConflictError } from '../../lib/error';
 import { expiresInDays, expiresInHrs, isDateExpired } from '../../util/time';
-import { UserDTO } from './auth.types';
+import { UserAuthDTO, UserDTO } from './auth.types';
 import { EmailAuthInput, SessionInputSchema } from './auth.validators';
 
 // Not in v1.0.0
@@ -123,6 +124,38 @@ export const createUserWithEmail = async (param: EmailAuthInput, sessionParam: S
     }
 }
 
+export const storeDataInSession = async (param: EmailAuthInput, sessionParam: SessionInputSchema, userId: string): Promise<string> => {
+    // Transaction
+    return await prisma.$transaction(async (tx) => {
+        // UserAuth
+        await tx.userAuth.update({
+            where: {
+                email_authProvider: {
+                    email: param.email,
+                    authProvider: AuthProvider.EMAIL
+                }
+            },
+            data: {
+                lastSignInAt: new Date()
+            }
+        });
+
+        // Session
+        await tx.session.create({
+            data: {
+                userId: userId,
+                tokenHash: sessionParam.tokenHash,
+                expiresAt: expiresInDays(config.REFRESH_TOKEN_TTL_DAYS),
+                userAgent: sessionParam.userAgent,
+                ip: sessionParam.ip
+            }
+        });
+
+        return userId;
+    });
+}
+
+
 /**
  * DB method to verify token. Returns either true or false.
  * @param token Token to be verified
@@ -191,10 +224,13 @@ export const getUserFromUserId = async (userId: string): Promise<UserDTO | null>
  * @param email Email Address
  * @returns Either UserDTO object or Null If email address does not exists
  */
-export const getUserFromEmail = async (email: string): Promise<UserDTO | null> => {
-    return await prisma.user.findUnique({
+export const getUserFromEmail = async (email: string): Promise<UserAuthDTO | null> => {
+    return await prisma.userAuth.findUnique({
         where: {
-            email: email,
+            email_authProvider: {
+                authProvider: AuthProvider.EMAIL,
+                email: email
+            }
         }
     });
 }

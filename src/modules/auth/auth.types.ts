@@ -21,11 +21,12 @@ export interface UserAuthDTO {
     userId: string,
     email: string,
     authProvider: AuthProvider,
-    password: string,
+    providerId: string | null,
+    password: string | null,
     createdAt: Date,
     updatedAt: Date,
     lastSignInAt: Date,
-    meta: Record<string, unknown>,
+    meta: Object | null,
 }
 
 /**
