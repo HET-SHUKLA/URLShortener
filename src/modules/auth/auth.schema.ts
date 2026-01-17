@@ -152,6 +152,7 @@ const refreshResponse = {
   },
 
   400: responseSchema({ status: 400, message: "Provided data is invalid", success: false }),
+  401: responseSchema({ status: 401, message: "Token is either expired or invalid", success: false }),
   ...internalServerErrorResponse
 }
 
@@ -281,9 +282,9 @@ export const meSchema = {
  */
 export const logoutSchema = {
   tags: [AUTH],
-  summary: "Login user with Email and Password",
-  description: "Login user with Email and Password",
-  headers: authHeader,
+  summary: "Logout user",
+  description: "Logout user",
+  headers: logoutHeader,
   response: logoutResponse
 }
 
@@ -294,7 +295,7 @@ export const logoutSessionSchema = {
   tags: [AUTH],
   summary: "Logout user from specific session",
   description: "Logout user from specific session",
-  headers: authHeader,
+  headers: logoutHeader,
   params: {
     type: 'object',
     required: ['sessionId'],
