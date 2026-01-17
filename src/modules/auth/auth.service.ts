@@ -81,7 +81,44 @@ export const createUserUsingEmailService = async (param: EmailAuthInput, userAge
 }
 
 export const loginUserUsingEmailPassword = async (param: EmailAuthInput, userAgent: string | null, ip: string | null): Promise<UserCreatedResponse> => {
-    
+    // DB call to fetch user data based on email address
+    const data = {userId: ""};
+
+    if (!data) {
+        throw new AuthError("Email or Password is incorrect");
+    }
+
+    // TODO: compare password
+    // If password is correct, Send DB call and store session data
+    // Return
+
+    const refreshToken = generateRefreshToken();
+
+    if (!refreshToken) {
+        throw new InternalServerError();
+    }
+
+    const tokenHash = hashToken(refreshToken);
+
+    const sessionSchema: SessionInputSchema = {
+        tokenHash,
+        userAgent,
+        ip
+    }
+
+    const accessToken = generateAccessToken(data.userId);
+
+    if (!accessToken) {
+        throw new InternalServerError();
+    }
+
+    const response: UserCreatedResponse = {
+        id: data.userId,
+        accessToken,
+        refreshToken,
+    };
+
+    return response;
 }
 
 /**
