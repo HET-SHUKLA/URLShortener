@@ -81,14 +81,15 @@ model UserAuth {
 
 // Table: sessions
 model Session {
-  id        String   @id @default(uuid())
-  userId    String
-  tokenHash String   @unique // Refresh token
-  userAgent String?
-  ip        String?
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  revokedAt DateTime?
+  id         String   @id @default(uuid())
+  userId     String
+  tokenHash  String   @unique // Refresh token
+  userAgent  String?
+  ip         String?
+  lastActive DateTime @default(now())
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  revokedAt  DateTime?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
