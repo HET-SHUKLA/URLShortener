@@ -185,3 +185,16 @@ export const getUserFromUserId = async (userId: string): Promise<UserDTO | null>
         }
     });
 }
+
+/**
+ * DB method to get User data from Email address
+ * @param email Email Address
+ * @returns Either UserDTO object or Null If email address does not exists
+ */
+export const getUserFromEmail = async (email: string): Promise<UserDTO | null> => {
+    return await prisma.user.findUnique({
+        where: {
+            email: email,
+        }
+    });
+}
