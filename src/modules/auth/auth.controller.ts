@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { emailAuthInputSchema } from "./auth.validators";
-import { createUserUsingEmailService, getUserFromAccessTokenService, verifyEmailAddressService } from "./auth.service";
+import { createUserUsingEmailService, getUserFromAccessTokenService, loginUserUsingEmailPassword, verifyEmailAddressService } from "./auth.service";
 import { badRequest, created, ok } from "../../lib/response";
 import { getHeaderString } from "../../util/header";
 import { config } from "../../config/env.config";
@@ -159,7 +159,84 @@ export const handleGoogleAuth = () => {};
 
 export const handleRefreshToken = () => {};
 
-export const handleUserLogin = () => {};
+// TODO: Merge login and register method
+export const handleUserLogin = async (
+  req: FastifyRequest,
+  reply: FastifyReply
+) => {
+  const clientRaw = req.headers["x-client-type"];
+  const userAgent = req.headers["user-agent"] ?? null;
+  const ipAddress = req.ip;
+
+  logInfo(
+    reply.log,
+    AUTH_REGISTER_REQUEST,
+    "User login request receieved",
+    {
+      route: reply.request?.routeOptions.url,
+      userAgent,
+      ipAddress,
+    },
+  );
+
+  const clientType = getHeaderString(clientRaw)?.trim().toLowerCase();
+
+  if (!clientType) {
+    return badRequest(reply, "X-Client-Type header is missing!");
+  }
+
+  if (![MOBILE, WEB].includes(clientType)) {
+    return badRequest(reply, "X-Client-Type header is invalid!");
+  }
+
+  const body = emailAuthInputSchema.parse(req.body);
+
+  const isMobile = clientType === "mobile";
+
+  logInfo(reply.log, AUTH_USER_CREATING, "User logging in has been started");
+
+  const res = await loginUserUsingEmailPassword(body, userAgent, ipAddress);
+
+  if (isMobile) {
+    logInfo(
+      reply.log,
+      AUTH_USER_CREATED,
+      "User successfully logged in through mobile",
+      {
+        userId: res.id,
+        ip: ipAddress,
+        userAgent,
+      },
+    );
+
+    return created(reply, "User created successfully", res);
+  }
+
+  const refreshToken = res.refreshToken;
+  reply.setCookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: config.NODE_ENV === "production" || config.NODE_ENV === "staging",
+    sameSite: "lax",
+    path: "/api/v1/auth", // TODO: Needs to fix this, Maybe use req.route
+    maxAge: REFRESH_TOKEN_TTL_SECONDS,
+  });
+
+  logInfo(
+    reply.log,
+    AUTH_USER_CREATED,
+    "User successfully logged in, Refresh token Cookie set",
+    {
+      userId: res.id,
+      ip: ipAddress,
+      userAgent,
+    },
+  );
+
+  return created(reply, "User logged in successfully", {
+    id: res.id,
+    accessToken: res.accessToken,
+  });
+};
 
 export const handleUserLogout = () => {};
 

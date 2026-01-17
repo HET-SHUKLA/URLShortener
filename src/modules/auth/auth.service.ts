@@ -80,6 +80,10 @@ export const createUserUsingEmailService = async (param: EmailAuthInput, userAge
     return response;
 }
 
+export const loginUserUsingEmailPassword = async (param: EmailAuthInput, userAgent: string | null, ip: string | null): Promise<UserCreatedResponse> => {
+    
+}
+
 /**
  * Service to fetch User's data based on Access token
  * @param token Access token
