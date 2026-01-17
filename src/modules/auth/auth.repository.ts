@@ -124,6 +124,13 @@ export const createUserWithEmail = async (param: EmailAuthInput, sessionParam: S
     }
 }
 
+/**
+ * DB method to store logging / session information in Table
+ * @param param EmailAuthInput
+ * @param sessionParam SessionInputSchema
+ * @param userId UserId - string
+ * @returns UserId
+ */
 export const storeDataInSession = async (param: EmailAuthInput, sessionParam: SessionInputSchema, userId: string): Promise<string> => {
     // Transaction
     return await prisma.$transaction(async (tx) => {
@@ -154,7 +161,6 @@ export const storeDataInSession = async (param: EmailAuthInput, sessionParam: Se
         return userId;
     });
 }
-
 
 /**
  * DB method to verify token. Returns either true or false.

@@ -80,6 +80,13 @@ export const createUserUsingEmailService = async (param: EmailAuthInput, userAge
     return response;
 }
 
+/**
+ * Service to login user with Email and Password
+ * @param param EmailAuthInput
+ * @param userAgent UserAgent - string | null
+ * @param ip ipAddress of the User
+ * @returns UserCreatedResponse
+ */
 export const loginUserUsingEmailPassword = async (param: EmailAuthInput, userAgent: string | null, ip: string | null): Promise<UserCreatedResponse> => {
     // DB call to fetch user data based on email address
     const data = await getUserFromEmail(param.email);
