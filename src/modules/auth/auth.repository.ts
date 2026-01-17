@@ -6,7 +6,7 @@ import { AuthProvider, VerificationTokenType } from '../../generated/prisma/enum
 import { ConflictError } from '../../lib/error';
 import { expiresInDays, expiresInHrs, isDateExpired } from '../../util/time';
 import { UserAuthDTO, UserDTO } from './auth.types';
-import { EmailAuthInput, SessionInputSchema } from './auth.validators';
+import { AuthSchema, EmailAuthInput, SessionInputSchema } from './auth.validators';
 
 // Not in v1.0.0
 // export const createAuthUser = async (params: {
@@ -131,7 +131,7 @@ export const createUserWithEmail = async (param: EmailAuthInput, sessionParam: S
  * @param userId UserId - string
  * @returns UserId
  */
-export const storeDataInSession = async (param: EmailAuthInput, sessionParam: SessionInputSchema, userId: string): Promise<string> => {
+export const storeDataInSession = async (param: AuthSchema, sessionParam: SessionInputSchema, userId: string): Promise<string> => {
     // Transaction
     return await prisma.$transaction(async (tx) => {
         // UserAuth
@@ -139,7 +139,7 @@ export const storeDataInSession = async (param: EmailAuthInput, sessionParam: Se
             where: {
                 email_authProvider: {
                     email: param.email,
-                    authProvider: AuthProvider.EMAIL
+                    authProvider: param.authProvider
                 }
             },
             data: {

@@ -57,6 +57,10 @@ export const hashToken = (token: string): string => {
   return createHash("sha256").update(token, "utf8").digest("hex");
 }
 
+/**
+ * Helper function to generate verification token
+ * @returns Verification Token
+ */
 export const generateVerificationToken = (): string => {
     return randomBytes(32).toString("hex");
 }

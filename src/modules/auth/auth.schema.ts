@@ -260,6 +260,7 @@ export const loginSchema = {
   tags: [AUTH],
   summary: "Login user with Email and Password",
   description: "Login user with Email and Password",
+  headers: registerHeaders,
   body: registerBody,
   response: loginResponse
 }

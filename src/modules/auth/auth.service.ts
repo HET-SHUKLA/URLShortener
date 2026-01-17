@@ -5,8 +5,9 @@ import { createEmailTemplate, EmailTemplateEnum } from "../../jobs/email/templat
 import { generateRefreshToken, hashToken, generateAccessToken, generateVerificationToken, getUserIdFromAccessToken } from "../../util/tokens";
 import { createUserWithEmail, getUserFromEmail, getUserFromUserId, storeDataInSession, verifyToken } from "./auth.repository";
 import { UserCreatedResponse, UserDTO } from "./auth.types";
-import { EmailAuthInput, SessionInputSchema } from "./auth.validators";
+import { AuthSchema, EmailAuthInput, SessionInputSchema } from "./auth.validators";
 import { EMPTY_STRING } from "../../constants";
+import { AuthProvider } from "../../generated/prisma/enums";
 
 // export const authenticateUserWithEmail = async (param: EmailAuthInput) => {
 //     const record = await findUserAuthByEmail(param.email);
@@ -98,12 +99,14 @@ export const loginUserUsingEmailPassword = async (param: EmailAuthInput, userAge
     const isPasswordCorrect = await verifyPassword(param.password, data.password);
 
     if (!isPasswordCorrect) {
+        // Always send generalize message even if we know Email is correct here.
         throw new AuthError("Email or Password is incorrect");
     }
 
     const refreshToken = generateRefreshToken();
+    const accessToken = generateAccessToken(data.userId);
 
-    if (!refreshToken) {
+    if (!refreshToken || !accessToken) {
         throw new InternalServerError();
     }
 
@@ -115,13 +118,16 @@ export const loginUserUsingEmailPassword = async (param: EmailAuthInput, userAge
         ip
     }
 
-    const accessToken = generateAccessToken(data.userId);
-
-    if (!accessToken) {
-        throw new InternalServerError();
+    const authSchema: AuthSchema = {
+        ...param,
+        authProvider: AuthProvider.EMAIL
     }
 
-    const userId = await storeDataInSession(param, sessionSchema, data.userId);
+    const userId = await storeDataInSession(authSchema, sessionSchema, data.userId);
+
+    if (!userId) {
+        throw new InternalServerError();
+    }
 
     const response: UserCreatedResponse = {
         id: userId,

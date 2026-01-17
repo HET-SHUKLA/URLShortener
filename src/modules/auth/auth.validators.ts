@@ -30,6 +30,6 @@ export const sessionInputSchema = z.object({
 
 export type EmailAuthInput = z.infer<typeof emailAuthInputSchema>;
 
-export type Auth = z.infer<typeof authSchema>;
+export type AuthSchema = z.infer<typeof authSchema>;
 
 export type SessionInputSchema = z.infer<typeof sessionInputSchema>;

@@ -209,7 +209,7 @@ export const handleUserLogin = async (
       },
     );
 
-    return created(reply, "User created successfully", res);
+    return ok(reply, "User logged in successfully", res);
   }
 
   const refreshToken = res.refreshToken;
@@ -232,7 +232,7 @@ export const handleUserLogin = async (
     },
   );
 
-  return created(reply, "User logged in successfully", {
+  return ok(reply, "User logged in successfully", {
     id: res.id,
     accessToken: res.accessToken,
   });
