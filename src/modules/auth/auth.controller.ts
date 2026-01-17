@@ -131,6 +131,12 @@ export const handleUserRegister = async (
   });
 };
 
+/**
+ * Handle Link Verification
+ * @param req FastifyRequest
+ * @param reply FastifyReply
+ * @returns API response
+ */
 export const handleVerification = async (
   req: FastifyRequest<{Params: {item: string, token: string}}>,
   reply: FastifyReply
