@@ -309,3 +309,17 @@ export const revokeSesionWithSessionId = async (sessionId: string): Promise<bool
 
     return true;
 }
+
+// TODO: Fix this any, Create new SessionDTO
+export const updateRefreshToken = async (oldToken: string, newToken: string): Promise<any | undefined> => {
+    return await prisma.session.update({
+        where: {
+            tokenHash: oldToken
+        },
+        data: {
+            tokenHash: newToken,
+            expiresAt: expiresInDays(config.REFRESH_TOKEN_TTL_DAYS)
+            // TODO: Update token version
+        }
+    });
+}

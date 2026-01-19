@@ -3,7 +3,7 @@ import { AuthError, InternalServerError, NotFoundError } from "../../lib/error";
 import { hashPassword, verifyPassword } from "../../lib/password";
 import { createEmailTemplate, EmailTemplateEnum } from "../../jobs/email/template";
 import { generateRefreshToken, hashToken, generateAccessToken, generateVerificationToken, getUserIdFromAccessToken } from "../../util/tokens";
-import { createUserWithEmail, getUserFromEmail, getUserFromUserId, revokeAllRefreshToken, revokeRefreshToken, revokeSesionWithSessionId, storeDataInSession, verifyToken } from "./auth.repository";
+import { createUserWithEmail, getUserFromEmail, getUserFromUserId, revokeAllRefreshToken, revokeRefreshToken, revokeSesionWithSessionId, storeDataInSession, updateRefreshToken, verifyToken } from "./auth.repository";
 import { UserCreatedResponse, UserDTO } from "./auth.types";
 import { AuthSchema, EmailAuthInput, SessionInputSchema } from "./auth.validators";
 import { EMPTY_STRING } from "../../constants";
@@ -193,4 +193,35 @@ export const userLogoutSessionService = async (sessionId: string): Promise<boole
     }
 
     return true;
+}
+
+export const updateRefreshTokenService = async (oldToken: string): Promise<UserCreatedResponse> => {
+    const newToken = generateRefreshToken();
+
+    // TODO: Remove this code, Maybe?
+    if (!newToken) {
+        throw new InternalServerError();
+    }
+
+    const newHashedToken = hashToken(newToken);
+    const oldHashedToken = hashToken(oldToken);
+
+    const res = await updateRefreshToken(oldHashedToken, newHashedToken);
+
+    if (!res) {
+        throw new AuthError("Token is either expired or invalid");
+    }
+
+    const accessToken = generateAccessToken(res.userId);
+
+    if (!accessToken) {
+        throw new InternalServerError();
+    }
+    const response: UserCreatedResponse = {
+        id: res.userId,
+        accessToken,
+        refreshToken: newHashedToken
+    }
+
+    return response;
 }

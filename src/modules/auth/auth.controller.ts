@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { emailAuthInputSchema } from "./auth.validators";
-import { createUserUsingEmailService, getUserFromAccessTokenService, loginUserUsingEmailPassword, userLogoutService, userLogoutSessionService, verifyEmailAddressService } from "./auth.service";
+import { createUserUsingEmailService, getUserFromAccessTokenService, loginUserUsingEmailPassword, updateRefreshTokenService, userLogoutService, userLogoutSessionService, verifyEmailAddressService } from "./auth.service";
 import { badRequest, created, ok } from "../../lib/response";
 import { getHeaderString } from "../../util/header";
 import { config } from "../../config/env.config";
@@ -171,7 +171,49 @@ export const handleVerification = async (
 
 export const handleGoogleAuth = () => {};
 
-export const handleRefreshToken = () => {};
+export const handleRefreshToken = async (
+  req: FastifyRequest,
+  reply: FastifyReply
+) => {
+  const clientRaw = req.headers["x-client-type"];
+  const token = getRefreshToken(req);
+
+  const clientType = getHeaderString(clientRaw)?.trim().toLowerCase();
+
+  if (!token) {
+    return badRequest(reply, "Token is required!");
+  }
+
+  if (!clientType) {
+    return badRequest(reply, "X-Client-Type header is missing!");
+  }
+
+  if (![MOBILE, WEB].includes(clientType)) {
+    return badRequest(reply, "X-Client-Type header is invalid!");
+  }
+
+  const isMobile = clientType === "mobile";
+
+  const res = await updateRefreshTokenService(token);
+
+  if (isMobile) {
+    return ok(reply, "Token has been refreshed!", res);
+  }
+
+  const refreshToken = res.refreshToken;
+  reply.setCookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: config.NODE_ENV === "production" || config.NODE_ENV === "staging",
+    sameSite: "lax",
+    path: "/api/v1/auth", // TODO: Needs to fix this, Maybe use req.route
+    maxAge: REFRESH_TOKEN_TTL_SECONDS,
+  });
+
+  return ok(reply, "Token has been refreshed!", {
+    id: res.id,
+    accessToken: res.accessToken,
+  });
+};
 
 // TODO: Merge login and register method
 export const handleUserLogin = async (
