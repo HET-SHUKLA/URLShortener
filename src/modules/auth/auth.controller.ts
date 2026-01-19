@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { emailAuthInputSchema } from "./auth.validators";
-import { createUserUsingEmailService, getUserFromAccessTokenService, loginUserUsingEmailPassword, userLogoutService, verifyEmailAddressService } from "./auth.service";
+import { createUserUsingEmailService, getUserFromAccessTokenService, loginUserUsingEmailPassword, userLogoutService, userLogoutSessionService, verifyEmailAddressService } from "./auth.service";
 import { badRequest, created, ok } from "../../lib/response";
 import { getHeaderString } from "../../util/header";
 import { config } from "../../config/env.config";
@@ -276,4 +276,17 @@ export const handleUserLogout = async (
   throw new InternalServerError("Something went wrong, Try again after some time");
 };
 
-export const handleSessionLogout = () => {};
+export const handleSessionLogout = async (
+  req: FastifyRequest<{Params: {sessionId: string}}>,
+  reply: FastifyReply
+) => {
+  const { sessionId } = req.params;
+
+  const isUserLoggedOut = await userLogoutSessionService(sessionId);
+
+  if (isUserLoggedOut) {
+    return ok(reply, "User logged out successfully");
+  }
+
+  throw new InternalServerError("Something went wrong, Try again after some time");
+};

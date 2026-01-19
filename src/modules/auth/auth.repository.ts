@@ -289,3 +289,23 @@ export const revokeAllRefreshToken = async (token: string): Promise<boolean> => 
 
     return true;
 }
+
+export const revokeSesionWithSessionId = async (sessionId: string): Promise<boolean> => {
+    const currentDate = new Date();
+
+    const data = await prisma.session.update({
+        where: {
+            id: sessionId
+        },
+        data: {
+            expiresAt: currentDate,
+            revokedAt: currentDate
+        }
+    });
+
+    if (!data) {
+        return false;
+    }
+
+    return true;
+}

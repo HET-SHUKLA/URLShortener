@@ -3,7 +3,7 @@ import { AuthError, InternalServerError, NotFoundError } from "../../lib/error";
 import { hashPassword, verifyPassword } from "../../lib/password";
 import { createEmailTemplate, EmailTemplateEnum } from "../../jobs/email/template";
 import { generateRefreshToken, hashToken, generateAccessToken, generateVerificationToken, getUserIdFromAccessToken } from "../../util/tokens";
-import { createUserWithEmail, getUserFromEmail, getUserFromUserId, revokeAllRefreshToken, revokeRefreshToken, storeDataInSession, verifyToken } from "./auth.repository";
+import { createUserWithEmail, getUserFromEmail, getUserFromUserId, revokeAllRefreshToken, revokeRefreshToken, revokeSesionWithSessionId, storeDataInSession, verifyToken } from "./auth.repository";
 import { UserCreatedResponse, UserDTO } from "./auth.types";
 import { AuthSchema, EmailAuthInput, SessionInputSchema } from "./auth.validators";
 import { EMPTY_STRING } from "../../constants";
@@ -177,6 +177,16 @@ export const userLogoutService = async (allSession: boolean, refreshToken: strin
     } else {
         isUserLoggedOut = await revokeRefreshToken(hashedToken);
     }
+
+    if (!isUserLoggedOut) {
+        throw new AuthError("Token is either expired or invalid");
+    }
+
+    return true;
+}
+
+export const userLogoutSessionService = async (sessionId: string): Promise<boolean> => {
+    const isUserLoggedOut = await revokeSesionWithSessionId(sessionId);
 
     if (!isUserLoggedOut) {
         throw new AuthError("Token is either expired or invalid");
