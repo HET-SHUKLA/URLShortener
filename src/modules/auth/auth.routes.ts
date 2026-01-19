@@ -50,6 +50,10 @@ const authRoutes = async (fastify: FastifyInstance) => {
     // fastify.post("/reset-password?tokenId&token", handleNewPassword);
 
     // DELETE
+    fastify.delete("/logout/all", {
+        schema: logoutSchema,
+        handler: handleUserLogout
+    });
     fastify.delete("/logout", {
         schema: logoutSchema,
         handler: handleUserLogout

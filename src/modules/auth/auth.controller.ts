@@ -17,6 +17,20 @@ import {
 } from "../../constants";
 import { AuthError, NotFoundError } from "../../lib/error";
 
+function getRefreshToken(request: FastifyRequest): string | null {
+  if (request.cookies?.refreshToken) {
+    return request.cookies.refreshToken
+  }
+
+  const auth = request.headers.authorization
+  if (auth?.startsWith('Bearer ')) {
+    return auth.slice(7)
+  }
+
+  return null
+}
+
+
 /**
  * Returns User's information based on access token
  * @param req FastifyRequest
