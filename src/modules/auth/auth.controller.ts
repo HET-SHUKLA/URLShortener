@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { emailAuthInputSchema } from "./auth.validators";
-import { createUserUsingEmailService, getUserFromAccessTokenService, loginUserUsingEmailPassword, verifyEmailAddressService } from "./auth.service";
+import { createUserUsingEmailService, getUserFromAccessTokenService, loginUserUsingEmailPassword, userLogoutService, verifyEmailAddressService } from "./auth.service";
 import { badRequest, created, ok } from "../../lib/response";
 import { getHeaderString } from "../../util/header";
 import { config } from "../../config/env.config";
@@ -15,7 +15,7 @@ import {
   REFRESH_TOKEN_TTL_SECONDS,
   WEB,
 } from "../../constants";
-import { AuthError, NotFoundError } from "../../lib/error";
+import { AuthError, InternalServerError, NotFoundError } from "../../lib/error";
 
 function getRefreshToken(request: FastifyRequest): string | null {
   if (request.cookies?.refreshToken) {
@@ -252,6 +252,23 @@ export const handleUserLogin = async (
   });
 };
 
-export const handleUserLogout = () => {};
+export const handleUserLogout = async (
+  req: FastifyRequest,
+  reply: FastifyReply
+) => {
+  const refreshToken = getRefreshToken(req);
+
+  if (!refreshToken) {
+    return badRequest(reply, "Token is required to log out user");
+  }
+
+  const isUserLoggedOut = await userLogoutService(false, refreshToken);
+
+  if (isUserLoggedOut) {
+    return ok(reply, "User logged out successfully");
+  }
+
+  throw new InternalServerError("Something went wrong, Try again after some time");
+};
 
 export const handleSessionLogout = () => {};

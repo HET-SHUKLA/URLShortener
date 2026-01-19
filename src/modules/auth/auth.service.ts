@@ -167,3 +167,7 @@ export const getUserFromAccessTokenService = async (token: string): Promise<User
 export const verifyEmailAddressService = async (token: string): Promise<boolean> => {
     return await verifyToken(token);
 }
+
+export const userLogoutService = async (allSession: boolean, refreshToken: string): Promise<boolean> => {
+
+}
