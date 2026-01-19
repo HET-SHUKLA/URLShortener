@@ -240,3 +240,52 @@ export const getUserFromEmail = async (email: string): Promise<UserAuthDTO | nul
         }
     });
 }
+
+export const revokeRefreshToken = async (token: string): Promise<boolean> => {
+    const currentDate = new Date();
+    const data = await prisma.session.update({
+        where: {
+            tokenHash: token
+        },
+        data: {
+            revokedAt: currentDate,
+            expiresAt: currentDate
+        }
+    });
+
+    if (!data) {
+        return false;
+    }
+
+    return true;
+}
+
+export const revokeAllRefreshToken = async (token: string): Promise<boolean> => {
+    const currentDate = new Date();
+
+    const session = await prisma.session.findUnique({
+        where: {
+            tokenHash: token
+        }
+    });
+
+    if (!session) {
+        return false;
+    }
+
+    const data = await prisma.session.updateMany({
+        where: {
+            userId: session.userId
+        },
+        data: {
+            expiresAt: currentDate,
+            revokedAt: currentDate
+        }
+    });
+
+    if (!data) {
+        return false;
+    }
+
+    return true;
+}
