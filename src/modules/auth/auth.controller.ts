@@ -257,12 +257,17 @@ export const handleUserLogout = async (
   reply: FastifyReply
 ) => {
   const refreshToken = getRefreshToken(req);
+  let allSessions = false;
 
   if (!refreshToken) {
     return badRequest(reply, "Token is required to log out user");
   }
 
-  const isUserLoggedOut = await userLogoutService(false, refreshToken);
+  if (req.routeOptions.url?.includes("all")) {
+    allSessions = true;
+  }
+
+  const isUserLoggedOut = await userLogoutService(allSessions, refreshToken);
 
   if (isUserLoggedOut) {
     return ok(reply, "User logged out successfully");
