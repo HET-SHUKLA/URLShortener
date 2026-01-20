@@ -276,7 +276,7 @@ export const loginSchema = {
  */
 export const meSchema = {
   tags: [AUTH],
-  summary: "Retruns current user information",
+  summary: "Returns current user information",
   description: "Get current user information using Access token",
   headers: authHeader,
   response: meResponse
