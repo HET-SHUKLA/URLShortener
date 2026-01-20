@@ -193,6 +193,7 @@ const meSuccessData = {
     },
     accountType: {
       type: 'string',
+      enum: ["GOOGLE", "EMAIL"],
       description: 'Type of an account',
       example: 'GOOGLE'
     }
