@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { emailAuthInputSchema, GoogleAuthUser } from "./auth.validators";
-import { createUserUsingEmailService, getUserFromAccessTokenService, loginUserUsingEmailPassword, updateRefreshTokenService, userLogoutService, userLogoutSessionService, verifyEmailAddressService } from "./auth.service";
+import { authUserUsingGoogleService, createUserUsingEmailService, getUserFromAccessTokenService, loginUserUsingEmailPassword, updateRefreshTokenService, userLogoutService, userLogoutSessionService, verifyEmailAddressService } from "./auth.service";
 import { badRequest, created, ok } from "../../lib/response";
 import { getHeaderString } from "../../util/header";
 import { config } from "../../config/env.config";
@@ -55,7 +55,7 @@ export const handleMeAuth = async (
 
   const responseData = {
     id: userData.id,
-    email: userData.email,
+    email: userData.user_auth[0]?.email,
     isEmailVerified: userData.isEmailVerified
   }
 

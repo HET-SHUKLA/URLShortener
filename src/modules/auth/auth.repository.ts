@@ -5,7 +5,7 @@ import { Prisma } from '../../generated/prisma/client';
 import { AuthProvider, VerificationTokenType } from '../../generated/prisma/enums';
 import { ConflictError } from '../../lib/error';
 import { expiresInDays, expiresInHrs, isDateExpired } from '../../util/time';
-import { UserAuthDTO, UserDTO } from './auth.types';
+import { UserAuthDTO, UserDTO, UserMeDBResponse } from './auth.types';
 import { AuthSchema, EmailAuthInput, GoogleAuthUser, SessionInputSchema } from './auth.validators';
 
 // Not in v1.0.0
@@ -217,10 +217,17 @@ export const verifyToken = async (token: string): Promise<boolean> => {
  * @param userId User ID
  * @returns Either UserDTO object or Null If user id does not exists
  */
-export const getUserFromUserId = async (userId: string): Promise<UserDTO | null> => {
+export const getUserFromUserId = async (userId: string): Promise<UserMeDBResponse | null> => {
     return await prisma.user.findUnique({
         where: {
             id: userId,
+        },
+        include: {
+            user_auth: {
+                select: {
+                    email: true
+                }
+            }
         }
     });
 }
@@ -230,11 +237,11 @@ export const getUserFromUserId = async (userId: string): Promise<UserDTO | null>
  * @param email Email Address
  * @returns Either UserDTO object or Null If email address does not exists
  */
-export const getUserFromEmail = async (email: string): Promise<UserAuthDTO | null> => {
+export const getUserFromEmail = async (email: string, provider: AuthProvider): Promise<UserAuthDTO | null> => {
     return await prisma.userAuth.findUnique({
         where: {
             email_authProvider: {
-                authProvider: AuthProvider.EMAIL,
+                authProvider: provider,
                 email: email
             }
         }

@@ -5,7 +5,6 @@ import { AuthProvider } from "../../generated/prisma/enums";
  */
 export interface UserDTO {
     id: string;
-    email: string;
     isEmailVerified: boolean;
     emailVerifiedAt: Date | null;
     createdAt: Date;
@@ -36,4 +35,10 @@ export interface UserCreatedResponse {
     id: string,
     accessToken: string,
     refreshToken: string // Only when requested through mobile
+}
+
+export interface UserMeDBResponse extends UserDTO {
+    user_auth: {
+        email: string
+    }[]
 }

@@ -3,8 +3,8 @@ import { AuthError, InternalServerError, NotFoundError } from "../../lib/error";
 import { hashPassword, verifyPassword } from "../../lib/password";
 import { createEmailTemplate, EmailTemplateEnum } from "../../jobs/email/template";
 import { generateRefreshToken, hashToken, generateAccessToken, generateVerificationToken, getUserIdFromAccessToken } from "../../util/tokens";
-import { createUserWithEmail, getUserFromEmail, getUserFromUserId, revokeAllRefreshToken, revokeRefreshToken, revokeSesionWithSessionId, storeDataInSession, updateRefreshToken, verifyToken } from "./auth.repository";
-import { UserCreatedResponse, UserDTO } from "./auth.types";
+import { createUserWithEmail, createUserWithGoogle, getUserFromEmail, getUserFromUserId, revokeAllRefreshToken, revokeRefreshToken, revokeSesionWithSessionId, storeDataInSession, updateRefreshToken, verifyToken } from "./auth.repository";
+import { UserCreatedResponse, UserDTO, UserMeDBResponse } from "./auth.types";
 import { AuthSchema, EmailAuthInput, GoogleAuthUser, SessionInputSchema } from "./auth.validators";
 import { EMPTY_STRING } from "../../constants";
 import { AuthProvider } from "../../generated/prisma/enums";
@@ -90,7 +90,7 @@ export const createUserUsingEmailService = async (param: EmailAuthInput, userAge
  */
 export const loginUserUsingEmailPassword = async (param: EmailAuthInput, userAgent: string | null, ip: string | null): Promise<UserCreatedResponse> => {
     // DB call to fetch user data based on email address
-    const data = await getUserFromEmail(param.email);
+    const data = await getUserFromEmail(param.email, AuthProvider.EMAIL);
 
     if (!data || !data.password) {
         throw new AuthError("Email or Password is incorrect");
@@ -143,7 +143,7 @@ export const loginUserUsingEmailPassword = async (param: EmailAuthInput, userAge
  * @param token Access token
  * @returns UserDTO object
  */
-export const getUserFromAccessTokenService = async (token: string): Promise<UserDTO> => {
+export const getUserFromAccessTokenService = async (token: string): Promise<UserMeDBResponse> => {
     const userId = getUserIdFromAccessToken(token);
 
     if (!userId) {
@@ -244,7 +244,19 @@ export const authUserUsingGoogleService = async (data: GoogleAuthUser): Promise<
         ip
     }
 
-    const userId = await createUserWithGoogle(data, sessionSchema);
+    const user = await getUserFromEmail(data.email, AuthProvider.GOOGLE);
+
+    const authSchema: AuthSchema = {
+        email: data.email,
+        authProvider: AuthProvider.GOOGLE
+    }
+
+    let userId;
+    if (user) {
+        userId = await storeDataInSession(authSchema, sessionSchema, user.userId);
+    } else {
+        userId = await createUserWithGoogle(data, sessionSchema);
+    }
 
     if (!userId) {
         throw new InternalServerError();
