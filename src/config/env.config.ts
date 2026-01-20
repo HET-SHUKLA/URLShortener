@@ -77,6 +77,14 @@ const envSchema = z.object({
 
   VERIFICATION_TOKEN_TTL_HRS: z.coerce.number({
     error: "VERIFICATION_TOKEN_TTL_HRS is required",
+  }),
+
+  GOOGLE_CLIENT_SECRET: z.string({
+    error: "GOOGLE_CLIENT_SECRET is required"
+  }),
+
+  GOOGLE_CLIENT_ID: z.string({
+    error: "GOOGLE_CLIENT_ID is required"
   })
 });
 
