@@ -37,8 +37,9 @@ export interface UserCreatedResponse {
     refreshToken: string // Only when requested through mobile
 }
 
-export interface UserMeDBResponse extends UserDTO {
-    user_auth: {
-        email: string
-    }[]
+/**
+ * Response interface
+ */
+export interface MeResponse extends UserDTO {
+    user_auth: UserAuthDTO[]
 }

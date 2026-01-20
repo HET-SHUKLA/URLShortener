@@ -5,7 +5,7 @@ import { Prisma } from '../../generated/prisma/client';
 import { AuthProvider, VerificationTokenType } from '../../generated/prisma/enums';
 import { ConflictError } from '../../lib/error';
 import { expiresInDays, expiresInHrs, isDateExpired } from '../../util/time';
-import { UserAuthDTO, UserDTO, UserMeDBResponse } from './auth.types';
+import { UserAuthDTO, UserDTO, MeResponse } from './auth.types';
 import { AuthSchema, EmailAuthInput, GoogleAuthUser, SessionInputSchema } from './auth.validators';
 
 // Not in v1.0.0
@@ -215,19 +215,15 @@ export const verifyToken = async (token: string): Promise<boolean> => {
 /**
  * DB method to get User data from User ID
  * @param userId User ID
- * @returns Either UserDTO object or Null If user id does not exists
+ * @returns Either MeResponse object or Null If user id does not exists
  */
-export const getUserFromUserId = async (userId: string): Promise<UserMeDBResponse | null> => {
+export const getUserFromUserId = async (userId: string): Promise<MeResponse | null> => {
     return await prisma.user.findUnique({
         where: {
             id: userId,
         },
         include: {
-            user_auth: {
-                select: {
-                    email: true
-                }
-            }
+            user_auth: true
         }
     });
 }

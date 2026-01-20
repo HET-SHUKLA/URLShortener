@@ -4,9 +4,9 @@ import { randomBytes, createHash } from 'crypto';
 import { EMPTY_STRING } from '../constants';
 
 /**
- * Helper function to fetched user id from JWT access token
- * @param token Hashed JWT access token
- * @returns User Id
+ * Helper function to fetch user id from Access token
+ * @param token Access Token
+ * @returns Either userId or null
  */
 export const getUserIdFromAccessToken = (token: string): string | null => {
     try {

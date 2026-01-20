@@ -25,7 +25,11 @@ const authRoutes = async (fastify: FastifyInstance) => {
         schema: meSchema,
         handler: handleMeAuth
     });
-    fastify.get("/verify/:item/:token", handleVerification)
+
+    fastify.get("/verify/:item/:token", {
+        schema: meSchema,
+        handler: handleVerification
+    })
 
     //POST
     fastify.post("/register", { 

@@ -4,9 +4,8 @@ import { hashPassword, verifyPassword } from "../../lib/password";
 import { createEmailTemplate, EmailTemplateEnum } from "../../jobs/email/template";
 import { generateRefreshToken, hashToken, generateAccessToken, generateVerificationToken, getUserIdFromAccessToken } from "../../util/tokens";
 import { createUserWithEmail, createUserWithGoogle, getUserFromEmail, getUserFromUserId, revokeAllRefreshToken, revokeRefreshToken, revokeSesionWithSessionId, storeDataInSession, updateRefreshToken, verifyToken } from "./auth.repository";
-import { UserCreatedResponse, UserDTO, UserMeDBResponse } from "./auth.types";
+import { MeResponse, UserCreatedResponse } from "./auth.types";
 import { AuthSchema, EmailAuthInput, GoogleAuthUser, SessionInputSchema } from "./auth.validators";
-import { EMPTY_STRING } from "../../constants";
 import { AuthProvider } from "../../generated/prisma/enums";
 
 // export const authenticateUserWithEmail = async (param: EmailAuthInput) => {
@@ -139,11 +138,11 @@ export const loginUserUsingEmailPassword = async (param: EmailAuthInput, userAge
 }
 
 /**
- * Service to fetch User's data based on Access token
+ * Service to fetch User's data using Access token
  * @param token Access token
- * @returns UserDTO object
+ * @returns MeResponse object
  */
-export const getUserFromAccessTokenService = async (token: string): Promise<UserMeDBResponse> => {
+export const getUserFromAccessTokenService = async (token: string): Promise<MeResponse> => {
     const userId = getUserIdFromAccessToken(token);
 
     if (!userId) {
@@ -153,7 +152,7 @@ export const getUserFromAccessTokenService = async (token: string): Promise<User
     const data = await getUserFromUserId(userId);
 
     if (!data) {
-        throw new NotFoundError("User does not exists!");
+        throw new AuthError("Token is expired or invalid");
     }
 
     return data;

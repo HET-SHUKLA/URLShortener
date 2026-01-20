@@ -56,7 +56,8 @@ export const handleMeAuth = async (
   const responseData = {
     id: userData.id,
     email: userData.user_auth[0]?.email,
-    isEmailVerified: userData.isEmailVerified
+    isEmailVerified: userData.isEmailVerified,
+    accountType: userData.user_auth[0]?.authProvider
   }
 
   return ok(reply, "User details fetched successfully", responseData);
