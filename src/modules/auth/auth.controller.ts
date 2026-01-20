@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { emailAuthInputSchema } from "./auth.validators";
+import { emailAuthInputSchema, GoogleAuthUser } from "./auth.validators";
 import { createUserUsingEmailService, getUserFromAccessTokenService, loginUserUsingEmailPassword, updateRefreshTokenService, userLogoutService, userLogoutSessionService, verifyEmailAddressService } from "./auth.service";
 import { badRequest, created, ok } from "../../lib/response";
 import { getHeaderString } from "../../util/header";
@@ -16,6 +16,7 @@ import {
   WEB,
 } from "../../constants";
 import { AuthError, InternalServerError, NotFoundError } from "../../lib/error";
+import { OAuth2Client } from "google-auth-library";
 
 function getRefreshToken(request: FastifyRequest): string | null {
   if (request.cookies?.refreshToken) {
@@ -170,9 +171,68 @@ export const handleVerification = async (
 }
 
 export const handleGoogleAuth = async (
-  req: FastifyRequest,
+  req: FastifyRequest<{Body: {id: string}}>,
   reply: FastifyReply
 ) => {
+  const { id } = req.body;
+
+  const userAgent = req.headers["user-agent"] ?? null;
+  const ipAddress = req.ip;
+
+  const clientRaw = req.headers["x-client-type"];
+
+  const clientType = getHeaderString(clientRaw)?.trim().toLowerCase();
+
+  if (!clientType) {
+    return badRequest(reply, "X-Client-Type header is missing!");
+  }
+
+  if (![MOBILE, WEB].includes(clientType)) {
+    return badRequest(reply, "X-Client-Type header is invalid!");
+  }
+
+  if (!id) {
+    return badRequest(reply, "Google ID is invalid");
+  }
+  const client = new OAuth2Client();
+  const ticket = await client.verifyIdToken({
+    idToken: id,
+    audience: config.GOOGLE_CLIENT_ID,
+  });
+
+  const payload = ticket.getPayload();
+
+  if (!payload || !payload?.email) {
+    return badRequest(reply, "Unable to fetch Email address, Please try again or use different account!");
+  }
+
+  const data: GoogleAuthUser = {
+    sub: payload.sub,
+    email: payload.email,
+    userAgent,
+    ip: ipAddress
+  }
+  const res = await authUserUsingGoogleService(data);
+
+  const isMobile = clientType === "mobile";
+
+  if (isMobile) {
+    return created(reply, "User created successfully", res);
+  }
+
+  const refreshToken = res.refreshToken;
+  reply.setCookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: config.NODE_ENV === "production" || config.NODE_ENV === "staging",
+    sameSite: "lax",
+    path: "/api/v1/auth",
+    maxAge: REFRESH_TOKEN_TTL_SECONDS,
+  });
+
+  return created(reply, "User created successfully", {
+    id: res.id,
+    accessToken: res.accessToken,
+  });
 
 };
 

@@ -7,6 +7,13 @@ export interface meUserData {
     isEmailVerified: boolean;
 }
 
+export interface GoogleAuthUser {
+    sub: string;
+    email: string;
+    userAgent: string | null;
+    ip: string;
+}
+
 export const authSchema = z.object({
     email: z.email(),
     authProvider: z.enum(AuthProvider),

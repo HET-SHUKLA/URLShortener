@@ -6,7 +6,7 @@ import { AuthProvider, VerificationTokenType } from '../../generated/prisma/enum
 import { ConflictError } from '../../lib/error';
 import { expiresInDays, expiresInHrs, isDateExpired } from '../../util/time';
 import { UserAuthDTO, UserDTO } from './auth.types';
-import { AuthSchema, EmailAuthInput, SessionInputSchema } from './auth.validators';
+import { AuthSchema, EmailAuthInput, GoogleAuthUser, SessionInputSchema } from './auth.validators';
 
 // Not in v1.0.0
 // export const createAuthUser = async (params: {
@@ -78,7 +78,7 @@ export const createUserWithEmail = async (param: EmailAuthInput, sessionParam: S
             // User
             const user = await tx.user.create({
                 data: {
-                    email: param.email,
+                    isEmailVerified: false
                 }
             });
 
@@ -321,5 +321,41 @@ export const updateRefreshToken = async (oldToken: string, newToken: string): Pr
             expiresAt: expiresInDays(config.REFRESH_TOKEN_TTL_DAYS)
             // TODO: Update token version
         }
+    });
+}
+
+export const createUserWithGoogle = async (data: GoogleAuthUser, sessionParam: SessionInputSchema): Promise<string> => {
+
+    // Transaction to store user in User, UserAuth, Session
+    return await prisma.$transaction(async (tx) => {
+        // User
+        const user = await tx.user.create({
+            data: {
+                isEmailVerified: true,
+                emailVerifiedAt: new Date()
+            }
+        });
+
+        // UserAuth
+        await tx.userAuth.create({
+            data: {
+                userId: user.id,
+                email: data.email,
+                authProvider: AuthProvider.GOOGLE,
+            }
+        });
+
+        // Session
+        await tx.session.create({
+            data: {
+                userId: user.id,
+                tokenHash: sessionParam.tokenHash,
+                expiresAt: expiresInDays(config.REFRESH_TOKEN_TTL_DAYS),
+                userAgent: sessionParam.userAgent,
+                ip: sessionParam.ip
+            }
+        });
+
+        return user.id;
     });
 }

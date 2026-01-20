@@ -5,7 +5,7 @@ import { createEmailTemplate, EmailTemplateEnum } from "../../jobs/email/templat
 import { generateRefreshToken, hashToken, generateAccessToken, generateVerificationToken, getUserIdFromAccessToken } from "../../util/tokens";
 import { createUserWithEmail, getUserFromEmail, getUserFromUserId, revokeAllRefreshToken, revokeRefreshToken, revokeSesionWithSessionId, storeDataInSession, updateRefreshToken, verifyToken } from "./auth.repository";
 import { UserCreatedResponse, UserDTO } from "./auth.types";
-import { AuthSchema, EmailAuthInput, SessionInputSchema } from "./auth.validators";
+import { AuthSchema, EmailAuthInput, GoogleAuthUser, SessionInputSchema } from "./auth.validators";
 import { EMPTY_STRING } from "../../constants";
 import { AuthProvider } from "../../generated/prisma/enums";
 
@@ -222,6 +222,45 @@ export const updateRefreshTokenService = async (oldToken: string): Promise<UserC
         accessToken,
         refreshToken: newHashedToken
     }
+
+    return response;
+}
+
+export const authUserUsingGoogleService = async (data: GoogleAuthUser): Promise<UserCreatedResponse> => {
+    const userAgent = data.userAgent;
+    const ip = data.ip;
+
+    const refreshToken = generateRefreshToken();
+
+    if (!refreshToken) {
+        throw new InternalServerError();
+    }
+
+    const tokenHash = hashToken(refreshToken);
+
+    const sessionSchema: SessionInputSchema = {
+        tokenHash,
+        userAgent,
+        ip
+    }
+
+    const userId = await createUserWithGoogle(data, sessionSchema);
+
+    if (!userId) {
+        throw new InternalServerError();
+    }
+
+    const accessToken = generateAccessToken(userId);
+
+    if (!accessToken) {
+        throw new InternalServerError();
+    }
+
+    const response: UserCreatedResponse = {
+        id: userId,
+        accessToken,
+        refreshToken,
+    };
 
     return response;
 }
