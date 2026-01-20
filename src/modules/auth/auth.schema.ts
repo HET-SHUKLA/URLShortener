@@ -190,6 +190,11 @@ const meSuccessData = {
     emailVerified: {
       type: 'boolean',
       description: 'Email verified - True / False'
+    },
+    accountType: {
+      type: 'string',
+      description: 'Type of an account',
+      example: 'GOOGLE'
     }
   }
 }
@@ -272,7 +277,7 @@ export const loginSchema = {
 export const meSchema = {
   tags: [AUTH],
   summary: "Retruns current user information",
-  description: "Get current user information using JWT token",
+  description: "Get current user information using Access token",
   headers: authHeader,
   response: meResponse
 }
