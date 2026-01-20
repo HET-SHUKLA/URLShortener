@@ -169,7 +169,12 @@ export const handleVerification = async (
   throw new AuthError("Token is either expired or does not exists");
 }
 
-export const handleGoogleAuth = () => {};
+export const handleGoogleAuth = async (
+  req: FastifyRequest,
+  reply: FastifyReply
+) => {
+
+};
 
 export const handleRefreshToken = async (
   req: FastifyRequest,
@@ -312,6 +317,7 @@ export const handleUserLogout = async (
   const isUserLoggedOut = await userLogoutService(allSessions, refreshToken);
 
   if (isUserLoggedOut) {
+    reply.clearCookie("refreshToken");
     return ok(reply, "User logged out successfully");
   }
 
@@ -327,6 +333,7 @@ export const handleSessionLogout = async (
   const isUserLoggedOut = await userLogoutSessionService(sessionId);
 
   if (isUserLoggedOut) {
+    reply.clearCookie("refreshToken");
     return ok(reply, "User logged out successfully");
   }
 
