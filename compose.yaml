@@ -32,7 +32,7 @@ services:
       - 9229:9229 # Debugging port
     volumes:
       - ./:/usr/src/app
-      - node_modules:/usr/src/app/node_modules
+      # - node_modules:/usr/src/app/node_modules
     depends_on:
       - redis
       - postgres
@@ -82,5 +82,5 @@ services:
 volumes:
   pgdata:
   redisdata:
-  node_modules:
+  # node_modules:
   loki-data:
