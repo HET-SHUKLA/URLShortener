@@ -20,6 +20,9 @@ COPY . .
 # Set environment only for production builds
 #ENV NODE_ENV=development
 
+RUN mkdir -p /usr/src/app/node_modules
+RUN chown -R node:node /usr/src/app
+
 # Expose API port, Debugging port
 EXPOSE 3000 9229
 
